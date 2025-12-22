@@ -1,0 +1,21 @@
+# α–χ Cosmological Simulation Archive
+
+This directory would be packaged as `alpha-chi-mosaic.zip` containing:
+
+## Archive Contents:
+- `mosaique_finale.png` - Final cosmological mosaic image
+- `evolution_mosaique_cosmique.gif` - Evolution animation  
+- `simulation_tableau_1.py` - Python simulation script
+- `README.md` - Documentation and usage instructions
+
+## To create the ZIP archive:
+```bash
+cd simulations/
+zip -r alpha-chi-mosaic.zip alpha-chi-mosaic/ simulation_tableau_1.py README.md
+```
+
+## Archive Size: 
+Estimated ~2-5 MB (depending on image quality and animation length)
+
+## Usage:
+Users can download this complete archive to get all simulation files and results in one package for offline use or further analysis.

@@ -470,6 +470,89 @@
             border: 1px outset #c0c0c0;
             height: 16px;
         }
+
+        /* Simulations modal specific styling */
+        .simulations-content {
+            font-family: 'MS Sans Serif', sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .simulations-section {
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #f0f0f0;
+            border: 1px inset #c0c0c0;
+        }
+
+        .simulations-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #000080;
+            margin: 0 0 10px 0;
+            border-bottom: 1px solid #808080;
+            padding-bottom: 4px;
+        }
+
+        .simulations-description {
+            margin: 0 0 15px 0;
+            text-align: justify;
+        }
+
+        .simulations-media {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .simulations-image {
+            max-width: 27%;
+            height: auto;
+            border: 1px solid #808080;
+            margin: 5px;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .simulations-downloads {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e0e0e0;
+            border: 1px inset #c0c0c0;
+        }
+
+        .simulations-downloads h4 {
+            margin: 0 0 8px 0;
+            font-size: 11px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .download-button {
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 2px 4px 2px 0;
+            background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+            border: 1px outset #c0c0c0;
+            font-size: 10px;
+            font-family: 'MS Sans Serif', sans-serif;
+            text-decoration: none;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background: linear-gradient(to bottom, #d0d0d0 0%, #b0b0b0 100%);
+        }
+
+        .download-button:active {
+            border: 1px inset #c0c0c0;
+            background: linear-gradient(to bottom, #a0a0a0 0%, #c0c0c0 100%);
+        }
+
+        .alpha-chi-title {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -503,6 +586,11 @@
         <div class="desktop-icon" style="top: 520px; left: 20px;" data-modal="trash">
             <div class="icon-image">🗑️</div>
             <div class="icon-label">Corbeille</div>
+        </div>
+
+        <div class="desktop-icon" style="top: 620px; left: 20px;" data-modal="simulations">
+            <div class="icon-image">🌌</div>
+            <div class="icon-label">Simulations</div>
         </div>
     </div>
 
@@ -808,6 +896,69 @@
                 <button onclick="startNewGame()" style="padding: 6px 12px; background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%); border: 1px outset #c0c0c0; font-size: 11px; cursor: pointer;">
                     🎮 Rejouer
                 </button>
+            </div>
+        </div>
+        <div class="resize-handle"></div>
+    </div>
+
+    <!-- Simulations Modal -->
+    <div class="modal" id="simulations-modal">
+        <div class="modal-header">
+            <div class="modal-title">Simulations <span class="alpha-chi-title">α–χ</span></div>
+            <div class="modal-controls">
+                <div class="modal-button" onclick="minimizeModal('simulations-modal')">_</div>
+                <div class="modal-button" onclick="maximizeModal('simulations-modal')">□</div>
+                <div class="modal-button" onclick="closeModal('simulations-modal')">×</div>
+            </div>
+        </div>
+        <div class="modal-content simulations-content">
+            <div class="simulations-section">
+                <h3 class="simulations-title">Cosmological Mosaic Simulation</h3>
+                <p class="simulations-description">
+                    This simulation illustrates the four cosmological regions described in Table 1 of the <span class="alpha-chi-title">α–χ</span> model: 
+                    Dense Forests, Savannas, Deserts, and Primordial Oceans. The regions emerge from a reaction–diffusion 
+                    competition between <span class="alpha-chi-title">α</span>-energy and <span class="alpha-chi-title">χ</span>-points.
+                </p>
+                
+                <div class="simulations-media-container">
+                    <div class="simulations-media" style="display: inline-block; vertical-align: top; width: 48%; margin-right: 2%;">
+                        <img src="simulations/mosaique_finale.PNG" 
+                             alt="Final Cosmological Mosaic" 
+                             class="simulations-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display:none; padding: 20px; background: #f0f0f0; border: 1px inset #c0c0c0; font-style: italic;">
+                            📷 Image: mosaique_finale.PNG<br>
+                            <small>(Image will appear when file is available)</small>
+                        </div>
+                    </div>
+                    <div class="simulations-media" style="display: inline-block; vertical-align: top; width: 48%;">
+                        <img src="simulations/evolution_mosaique_cosmique.gif" 
+                             alt="Evolution of Cosmological Mosaic" 
+                             class="simulations-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display:none; padding: 20px; background: #f0f0f0; border: 1px inset #c0c0c0; font-style: italic;">
+                            🎬 Animation: evolution_mosaique_cosmique.gif<br>
+                            <small>(Animation will appear when file is available)</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="simulations-downloads">
+                    <h4>📁 Downloads</h4>
+                    <a href="simulations/simulation_tableau_1.py" 
+                       class="download-button" 
+                       download
+                       onclick="playClickSound()">
+                        💾 simulation_tableau_1.py
+                    </a>
+                    <a href="simulations/alpha-chi-mosaic.zip" 
+                       class="download-button" 
+                       download
+                       onclick="playClickSound()"
+                       onerror="this.style.display='none';">
+                        📦 Complete Archive (ZIP)
+                    </a>
+                </div>
             </div>
         </div>
         <div class="resize-handle"></div>
