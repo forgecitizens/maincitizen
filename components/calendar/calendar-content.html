@@ -1,0 +1,133 @@
+<!-- 
+========================================================================
+CALENDRIER WINDOWS RÉTRO - CONTENU POUR MODALE
+========================================================================
+Contenu simple du calendrier pour intégration dans le système de modales.
+Ce fichier ne contient que le contenu, sans les balises HTML/body/header.
+-->
+
+<style>
+    /* Styles inline pour éviter les conflits d'import */
+    #calendar-content {
+        width: 100%;
+        height: 100%;
+        padding: 8px;
+        background: #c0c0c0;
+        overflow: auto;
+        font-family: 'MS Sans Serif', sans-serif;
+    }
+    
+    /* Point de montage calendrier centré */
+    .calendar-mount-point {
+        width: 100%;
+        max-width: 380px;
+        margin: 0 auto;
+    }
+    
+    /* Animation de chargement */
+    .loading-spinner {
+        text-align: center;
+        padding: 40px;
+        color: #808080;
+        font-size: 12px;
+    }
+    
+    .loading-spinner .spinner {
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+        text-align: center;
+        padding: 20px;
+        color: #800000;
+        background: #ffe0e0;
+        border: 1px inset #c0c0c0;
+        margin: 10px;
+    }
+</style>
+
+<div id="calendar-content">
+    <!-- Point de montage pour le calendrier JavaScript -->
+    <div class="calendar-mount-point" id="calendar-mount-point">
+        <div class="loading-spinner">
+            <div class="spinner">⏳</div>
+            <div>Initialisation du calendrier...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /**
+     * ========================================================================
+     * INITIALISATION DU CALENDRIER DANS MODALE
+     * ========================================================================
+     */
+    
+    // Fonction d'initialisation retardée
+    function initializeCalendarContent() {
+        const mountPoint = document.getElementById('calendar-mount-point');
+        
+        if (!mountPoint) {
+            console.error('❌ Point de montage calendrier introuvable');
+            return;
+        }
+        
+        // Vérifier que les fonctions sont disponibles
+        if (typeof mountCalendar === 'function') {
+            try {
+                console.log('🎯 Montage calendrier dans modale...');
+                
+                mountCalendar(mountPoint, {
+                    showClock: true,
+                    enableNotes: true,
+                    theme: 'retro'
+                });
+                
+                console.log('✅ Calendrier monté avec succès dans la modale');
+                
+            } catch (error) {
+                console.error('❌ Erreur montage calendrier:', error);
+                
+                mountPoint.innerHTML = `
+                    <div class="error-message">
+                        <div><strong>⚠️ Erreur d'initialisation</strong></div>
+                        <div>Le calendrier n'a pas pu se charger correctement.</div>
+                        <div style="font-size: 10px; margin-top: 8px; color: #606060;">
+                            ${error.message}
+                        </div>
+                    </div>
+                `;
+            }
+        } else {
+            // Réessayer dans 200ms si les scripts ne sont pas encore chargés
+            console.log('⏳ Attente chargement scripts calendrier...');
+            setTimeout(initializeCalendarContent, 200);
+        }
+    }
+    
+    // Démarrer l'initialisation dès que le DOM est prêt
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeCalendarContent);
+    } else {
+        // DOM déjà prêt, initialiser immédiatement
+        setTimeout(initializeCalendarContent, 100);
+    }
+    
+    // Nettoyage à la fermeture
+    window.addEventListener('beforeunload', function() {
+        console.log('🧹 Nettoyage calendrier...');
+        if (typeof unmountCalendar === 'function') {
+            unmountCalendar();
+        }
+    });
+    
+    console.log('📄 Contenu calendrier chargé dans modale');
+</script>

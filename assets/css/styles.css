@@ -1,0 +1,788 @@
+        /* ===== IMPORTATION COMPOSANT CALENDRIER ===== */
+        /* Styles du calendrier chargés depuis le composant externe */
+        @import url("../../components/calendar/calendar.css");
+
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'MS Sans Serif', sans-serif;
+            font-size: 11px;
+            background: url('img/wallhaven-0j1rqw.jpg') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            overflow: hidden;
+            cursor: default;
+            user-select: none;
+        }
+
+        .desktop {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 28px);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .desktop-icon {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 2px;
+            transition: background-color 0.1s;
+        }
+
+        .desktop-icon:hover {
+            background-color: rgba(0, 0, 139, 0.3);
+            border: 1px dotted #ffffff;
+        }
+
+        .desktop-icon.selected {
+            background-color: rgba(0, 0, 139, 0.5);
+            border: 1px dotted #ffffff;
+        }
+
+        .icon-image {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 4px;
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .icon-label {
+            color: white;
+            text-align: center;
+            font-size: 10px;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+            line-height: 12px;
+            max-width: 70px;
+            word-wrap: break-word;
+        }
+
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+            border-top: 1px solid #dfdfdf;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4px;
+            z-index: 1000;
+        }
+
+        .start-button {
+            height: 22px;
+            padding: 0 8px;
+            background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+            border: 1px outset #c0c0c0;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .start-button:active {
+            border: 1px inset #c0c0c0;
+        }
+
+        .start-button.active {
+            border: 1px inset #c0c0c0;
+            background: linear-gradient(to bottom, #a0a0a0 0%, #c0c0c0 100%);
+        }
+
+        .taskbar-windows {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            flex: 1;
+            margin-left: 8px;
+            overflow: hidden;
+        }
+
+        .taskbar-window {
+            height: 22px;
+            padding: 0 8px;
+            background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+            border: 1px outset #c0c0c0;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            min-width: 80px;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .taskbar-window:active {
+            border: 1px inset #c0c0c0;
+        }
+
+        .taskbar-window.active {
+            border: 1px inset #c0c0c0;
+            background: linear-gradient(to bottom, #a0a0a0 0%, #c0c0c0 100%);
+        }
+
+        .system-tray {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 10px;
+            color: #000;
+        }
+
+        .battery {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .battery-icon {
+            width: 16px;
+            height: 8px;
+            border: 1px solid #000;
+            position: relative;
+            background: #00ff00;
+        }
+
+        .battery-icon::after {
+            content: '';
+            position: absolute;
+            right: -2px;
+            top: 2px;
+            width: 2px;
+            height: 4px;
+            background: #000;
+        }
+
+        .visitor-counter {
+            min-width: 45px;
+            text-align: center;
+            white-space: nowrap;
+            padding: 0 4px;
+        }
+
+        .start-menu {
+            position: absolute;
+            bottom: 28px;
+            left: 4px;
+            width: 200px;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            display: none;
+            z-index: 1001;
+        }
+
+        .start-menu.show {
+            display: block;
+        }
+
+        .start-menu-item {
+            padding: 4px 8px;
+            cursor: pointer;
+            border-bottom: 1px solid #a0a0a0;
+            font-size: 11px;
+        }
+
+        .start-menu-item:hover {
+            background: #0000ff;
+            color: white;
+        }
+
+        .modal {
+            position: absolute;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            min-width: 300px;
+            min-height: 200px;
+            display: none;
+            z-index: 100;
+            resize: both;
+            overflow: hidden;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-header {
+            background: linear-gradient(to right, #0000ff 0%, #8080ff 100%);
+            color: white;
+            padding: 2px 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            height: 18px;
+        }
+
+        .modal-title {
+            flex: 1;
+            padding-left: 4px;
+        }
+
+        .modal-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .modal-button {
+            width: 16px;
+            height: 14px;
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            font-size: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .modal-button:active {
+            border: 1px inset #c0c0c0;
+        }
+
+        .modal-content {
+            height: calc(100% - 22px);
+            background: white;
+            border: 1px inset #c0c0c0;
+            margin: 2px;
+            padding: 0; /* Le padding sera géré par le scroll-content */
+        }
+        
+        .modal-content .scroll-content {
+            padding: 8px;
+        }
+
+        .resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, transparent 0%, transparent 40%, #808080 40%, #808080 45%, transparent 45%, transparent 50%, #808080 50%, #808080 55%, transparent 55%);
+            cursor: se-resize;
+        }
+
+        /* Context menu styling */
+        .context-menu {
+            position: absolute;
+            background: #000000;
+            border: 1px solid #808080;
+            min-width: 120px;
+            display: none;
+            z-index: 1002;
+            font-size: 11px;
+        }
+
+        .context-menu.show {
+            display: block;
+        }
+
+        .context-menu-item {
+            padding: 4px 8px;
+            color: #c0c0c0;
+            cursor: pointer;
+            border-bottom: 1px solid #404040;
+        }
+
+        .context-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .context-menu-item:hover {
+            background: #0000ff;
+            color: white;
+        }
+
+        /* Info popup styling */
+        .info-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            width: 400px;
+            min-height: 200px;
+            display: none;
+            z-index: 1003;
+        }
+
+        .info-popup.show {
+            display: block;
+        }
+
+        .info-popup-header {
+            background: linear-gradient(to right, #0000ff 0%, #8080ff 100%);
+            color: white;
+            padding: 2px 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 18px;
+        }
+
+        .info-popup-content {
+            padding: 12px;
+            background: white;
+            border: 1px inset #c0c0c0;
+            margin: 2px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        /* ==================== MODERN SCROLL AREA COMPONENT ==================== */
+        
+        /* CSS Variables pour théming */
+        :root {
+            --scrollbar-size: 16px;
+            --scrollbar-button-size: 16px; /* Hauteur des boutons flèches */
+            --scrollbar-track: #f0f0f0;
+            --scrollbar-track-border: #d0d0d0;
+            --scrollbar-thumb: #c0c0c0;
+            --scrollbar-thumb-hover: #a0a0a0;
+            --scrollbar-thumb-active: #808080;
+            --scrollbar-button: #c0c0c0;
+            --scrollbar-button-hover: #d0d0d0;
+            --scrollbar-button-active: #a0a0a0;
+            --scrollbar-arrow: #000000;
+        }
+        
+        /* Container principal du scroll area */
+        .scroll-area {
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+        }
+        
+        /* Content wrapper - scroll natif masqué avec layout flex */
+        .scroll-content {
+            flex: 1;
+            height: 100%;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+            /* Suppression du padding/margin hack fragile */
+        }
+        
+        .scroll-content::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        
+        /* Scrollbar custom - reste en overlay mais le contenu est protégé par flex */
+        .scroll-bar {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: var(--scrollbar-size);
+            height: 100%;
+            background: var(--scrollbar-track);
+            border: 1px inset var(--scrollbar-track-border);
+            z-index: 10;
+            pointer-events: auto;
+        }
+        
+        /* Spacer invisible pour réserver l'espace de la scrollbar */
+        .scroll-spacer {
+            width: var(--scrollbar-size);
+            flex-shrink: 0;
+            visibility: hidden; /* Invisible mais prend l'espace */
+        }
+        
+        /* États spéciaux - gestion intelligente de l'espace */
+        .scroll-area.no-scroll .scroll-bar {
+            display: none;
+        }
+        
+        .scroll-area.no-scroll .scroll-spacer {
+            width: 0; /* Pas d'espace perdu si pas de scroll */
+        }
+        
+        /* Boutons de navigation */
+        .scroll-button {
+            width: 100%;
+            height: var(--scrollbar-button-size);
+            background: var(--scrollbar-button);
+            border: 1px outset var(--scrollbar-track-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: var(--scrollbar-arrow);
+            user-select: none;
+            transition: background-color 0.1s ease;
+            z-index: 12; /* Supérieur au thumb pour éviter l'overlap */
+            position: relative;
+        }
+        
+        .scroll-button:hover {
+            background: var(--scrollbar-button-hover);
+        }
+        
+        .scroll-button:active {
+            border: 1px inset var(--scrollbar-track-border);
+            background: var(--scrollbar-button-active);
+        }
+        
+        .scroll-button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        
+        /* Track de la scrollbar */
+        .scroll-track {
+            position: absolute;
+            top: var(--scrollbar-button-size);
+            left: 0;
+            right: 0;
+            bottom: var(--scrollbar-button-size);
+            cursor: pointer;
+        }
+        
+        /* Thumb de la scrollbar */
+        .scroll-thumb {
+            position: absolute;
+            left: 1px;
+            right: 1px;
+            background: var(--scrollbar-thumb);
+            border: 1px outset var(--scrollbar-track-border);
+            cursor: grab;
+            transition: background-color 0.1s ease;
+            min-height: 20px;
+            z-index: 11; /* Inférieur aux boutons pour éviter l'overlap */
+        }
+        
+        .scroll-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+        
+        .scroll-thumb:active,
+        .scroll-thumb.dragging {
+            cursor: grabbing;
+            background: var(--scrollbar-thumb-active);
+            border: 1px inset var(--scrollbar-track-border);
+        }
+        
+        /* États spéciaux */
+        .scroll-area.no-scroll .scroll-bar {
+            display: none;
+        }
+        
+        .scroll-area.no-scroll .scroll-spacer {
+            width: 0; /* Pas d'espace perdu si pas de scroll */
+        }
+        
+        /* Support de prefers-reduced-motion */
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-thumb,
+            .scroll-button {
+                transition: none;
+            }
+        }
+        
+        /* Responsive mobile */
+        @media (max-width: 768px) {
+            :root {
+                --scrollbar-size: 12px;
+                --scrollbar-button-size: 12px;
+            }
+            
+            .scroll-thumb {
+                min-height: 15px;
+            }
+        }
+        
+        /* Fallback webkit pour browsers qui le supportent mieux */
+        @supports (-webkit-appearance: none) {
+            .scroll-content::-webkit-scrollbar {
+                width: 0;
+                display: block;
+            }
+        }
+
+        /* Simulations modal specific styling */
+        .simulations-content {
+            font-family: 'MS Sans Serif', sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .simulations-section {
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #f0f0f0;
+            border: 1px inset #c0c0c0;
+        }
+
+        .simulations-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: #000080;
+            margin: 0 0 10px 0;
+            border-bottom: 1px solid #808080;
+            padding-bottom: 4px;
+        }
+
+        .simulations-description {
+            margin: 0 0 15px 0;
+            text-align: justify;
+        }
+
+        .simulations-media {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .simulations-image {
+            max-width: 27%;
+            height: auto;
+            border: 1px solid #808080;
+            margin: 5px;
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .simulations-downloads {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e0e0e0;
+            border: 1px inset #c0c0c0;
+        }
+
+        .simulations-downloads h4 {
+            margin: 0 0 8px 0;
+            font-size: 11px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .download-button {
+            display: inline-block;
+            padding: 4px 8px;
+            margin: 2px 4px 2px 0;
+            background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+            border: 1px outset #c0c0c0;
+            font-size: 10px;
+            font-family: 'MS Sans Serif', sans-serif;
+            text-decoration: none;
+            color: #000;
+            cursor: pointer;
+        }
+
+        .download-button:hover {
+            background: linear-gradient(to bottom, #d0d0d0 0%, #b0b0b0 100%);
+        }
+
+        .download-button:active {
+            border: 1px inset #c0c0c0;
+            background: linear-gradient(to bottom, #a0a0a0 0%, #c0c0c0 100%);
+        }
+
+        .alpha-chi-title {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+        }
+
+        /* Photo Gallery System - Reusable */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin: 12px 0;
+            padding: 8px;
+            background: #f0f0f0;
+            border: 1px inset #c0c0c0;
+        }
+
+        .photo-thumbnail {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .photo-thumbnail:hover {
+            transform: scale(1.05);
+            border: 1px outset #0000ff;
+        }
+
+        .photo-thumbnail:active {
+            border: 1px inset #c0c0c0;
+        }
+
+        /* Photo Lightbox */
+        .photo-lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .photo-lightbox.show {
+            display: flex;
+        }
+
+        .photo-lightbox-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            padding: 4px;
+        }
+
+        .photo-lightbox-image {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .photo-lightbox-controls {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+            border: 1px outset #c0c0c0;
+            padding: 4px;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .photo-lightbox-close {
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            padding: 2px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: 'MS Sans Serif', sans-serif;
+        }
+
+        .photo-lightbox-close:active {
+            border: 1px inset #c0c0c0;
+        }
+
+        /* ===== SCROLLAREA COMPONENT (CUSTOM SCROLLBAR) ===== */
+        .scrollarea {
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .scrollarea-viewport {
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+            margin-right: 16px; /* Space for scrollbar */
+            box-sizing: border-box;
+        }
+
+        .scrollarea-content {
+            height: auto;
+        }
+
+        .scrollarea-scrollbar {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 16px;
+            height: 100%;
+            background: #c0c0c0;
+            border: 1px inset #c0c0c0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .scrollarea-thumb {
+            position: absolute;
+            left: 1px;
+            width: 12px;
+            height: 20px;
+            background: linear-gradient(to right, #d0d0d0, #c0c0c0, #a0a0a0);
+            border: 1px outset #c0c0c0;
+            cursor: grab;
+            min-height: 20px;
+            top: 17px; /* Start after up button */
+        }
+
+        .scrollarea-thumb:hover {
+            background: linear-gradient(to right, #e0e0e0, #d0d0d0, #b0b0b0);
+        }
+
+        .scrollarea-thumb:active {
+            cursor: grabbing;
+            border: 1px inset #c0c0c0;
+            background: linear-gradient(to right, #a0a0a0, #808080, #606060);
+        }
+
+        /* Scrollbar up/down buttons */
+        .scrollarea-scrollbar::before {
+            content: "▲";
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 12px;
+            height: 15px;
+            background: linear-gradient(to bottom, #d0d0d0, #c0c0c0);
+            border: 1px outset #c0c0c0;
+            text-align: center;
+            line-height: 13px;
+            font-size: 8px;
+            cursor: pointer;
+            z-index: 11;
+        }
+
+        .scrollarea-scrollbar::after {
+            content: "▼";
+            position: absolute;
+            bottom: 1px;
+            left: 1px;
+            width: 12px;
+            height: 15px;
+            background: linear-gradient(to bottom, #d0d0d0, #c0c0c0);
+            border: 1px outset #c0c0c0;
+            text-align: center;
+            line-height: 13px;
+            font-size: 8px;
+            cursor: pointer;
+            z-index: 11;
+        }
+
+        .scrollarea-scrollbar:hover::before,
+        .scrollarea-scrollbar:hover::after {
+            background: linear-gradient(to bottom, #e0e0e0, #d0d0d0);
+        }
