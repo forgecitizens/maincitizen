@@ -1,14 +1,403 @@
-        /* ===== IMPORTATION COMPOSANT CALENDRIER ===== */
-        /* Styles du calendrier chargés depuis le composant externe */
-        @import url("../../components/calendar/calendar.css");
+        /* ===== NOUVEAU SYSTÈME DE FENÊTRES (MODALES MODERNISÉES) ===== */
+        
+        /* Structure de base : .window remplace .modal */
+        .window {
+            position: absolute;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            display: none;
+            z-index: 100;
+            resize: both;
+            overflow: hidden;
+            
+            /* Sizing responsive moderne */
+            min-width: 320px;
+            min-height: 240px;
+            max-width: min(95vw, 1200px);
+            max-height: min(90vh, 800px);
+            
+            /* Sizing par défaut */
+            width: min(540px, 92vw);
+            height: min(480px, 86vh);
+        }
 
+        .window.show {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Titlebar - identique à l'ancien modal-header mais plus claire */
+        .window-titlebar {
+            background: linear-gradient(to right, #0000ff 0%, #8080ff 100%);
+            color: white;
+            padding: 2px 4px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .window-title {
+            flex: 1;
+            padding-left: 4px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .window-button {
+            width: 16px;
+            height: 14px;
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            font-size: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .window-button:hover {
+            background: #d0d0d0;
+        }
+
+        .window-button:active {
+            border: 1px inset #c0c0c0;
+            background: #a0a0a0;
+        }
+
+        /* Body - contient tout le contenu scrollable */
+        .window-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: white;
+            border: 1px inset #c0c0c0;
+            margin: 2px;
+        }
+
+        /* Content - zone scrollable principale */  
+        .window-content {
+            flex: 1;
+            overflow: auto;
+            padding: 16px;
+            /* Scrollbar gutter pour éviter le jump layout */
+            scrollbar-gutter: stable;
+        }
+
+        /* Footer optionnel - reste collé au bas */
+        .window-footer {
+            flex-shrink: 0;
+            background: #f0f0f0;
+            border-top: 1px solid #c0c0c0;
+            padding: 4px 8px;
+            font-size: 10px;
+            color: #666;
+        }
+
+        /* Resize handle modernisé */
+        .window-resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, transparent 0%, transparent 40%, #808080 40%, #808080 45%, transparent 45%, transparent 50%, #808080 50%, #808080 55%, transparent 55%);
+            cursor: se-resize;
+        }
+
+        /* Responsive mobile */
+        @media (max-width: 1023px) {
+            .window {
+                width: calc(100vw - 16px) !important;
+                height: calc(100vh - 16px) !important;
+                max-width: none;
+                max-height: none;
+                left: 8px !important;
+                top: 8px !important;
+                resize: none;
+            }
+            
+            .window-content {
+                padding: 12px;
+            }
+            
+            .window-resize-handle {
+                display: none;
+            }
+        }
+
+        /* ===== COMPOSANTS FORMULAIRE DANS FENÊTRES ===== */
+        
+        .info-section, .form-section {
+            background: #f0f0f0;
+            border: 1px inset #c0c0c0;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            margin: 0 0 12px 0;
+            color: #000080;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 1px solid #c0c0c0;
+            padding-bottom: 4px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-icon {
+            font-weight: bold;
+            width: 20px;
+        }
+
+        .contact-text {
+            font-size: 12px;
+        }
+
+        .contact-link {
+            color: #0000ff;
+            text-decoration: underline;
+            font-size: 12px;
+        }
+
+        .contact-link:hover {
+            background: #e0e0ff;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .form-field {
+            flex: 1;
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #000080;
+        }
+
+        .field-input, .field-textarea {
+            width: 100%;
+            padding: 4px;
+            border: 1px inset #c0c0c0;
+            font-size: 11px;
+            font-family: 'MS Sans Serif', sans-serif;
+            background: white;
+        }
+
+        .field-input:focus, .field-textarea:focus {
+            outline: 1px dotted #000080;
+            outline-offset: 1px;
+        }
+
+        .field-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .action-button {
+            padding: 6px 16px;
+            border: 1px outset #c0c0c0;
+            font-size: 11px;
+            font-family: 'MS Sans Serif', sans-serif;
+            cursor: pointer;
+        }
+
+        .action-button.primary {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+            font-weight: bold;
+        }
+
+        .action-button.secondary {
+            background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
+        }
+
+        .action-button:hover {
+            background: linear-gradient(to bottom, #d0d0d0 0%, #b0b0b0 100%);
+        }
+
+        .action-button:active {
+            border: 1px inset #c0c0c0;
+        }
+
+        /* Mobile touch targets */
+        @media (max-width: 1023px) {
+            .action-button {
+                padding: 12px 20px;
+                font-size: 12px;
+                min-height: 44px;
+            }
+            
+            .field-input, .field-textarea {
+                padding: 8px;
+                font-size: 16px; /* Évite le zoom iOS */
+                min-height: 44px;
+            }
+            
+            .window-button {
+                min-width: 44px;
+                min-height: 32px;
+            }
+        }
+
+        /* ===== ACCORDION SYSTEM ===== */
+        .accordion-container {
+            width: 100%;
+        }
+
+        .accordion-item {
+            margin-bottom: 2px;
+            border: 1px solid #808080;
+            background: #c0c0c0;
+        }
+
+        .accordion-header {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%);
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            color: #000;
+            font-family: 'MS Sans Serif', sans-serif;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.1s ease;
+        }
+
+        .accordion-header:hover {
+            background: linear-gradient(to bottom, #d0d0d0 0%, #b0b0b0 100%);
+        }
+
+        .accordion-header:active,
+        .accordion-header.pressed {
+            background: linear-gradient(to bottom, #a0a0a0 0%, #c0c0c0 100%);
+            border: 1px inset #c0c0c0;
+        }
+
+        .accordion-header:focus {
+            outline: 1px dotted #000;
+            outline-offset: -2px;
+        }
+
+        .accordion-icon {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000;
+            transition: transform 0.2s ease-out;
+            width: 16px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            background: #ffffff;
+            font-size: 11px;
+            line-height: 1.4;
+            font-family: 'MS Sans Serif', sans-serif;
+            overflow: hidden;
+            transition: height 0.2s ease-out;
+            height: 0;
+        }
+
+        .accordion-item.active .accordion-content {
+            border-top: 1px inset #c0c0c0;
+        }
+
+        .accordion-content-inner {
+            padding: 12px;
+        }
+
+        /* Legacy accordion support (compatibilité avec code existant) */
+        .accordion-section {
+            margin-bottom: 12px;
+        }
+
+        .accordion-section .accordion-header {
+            border: 1px outset #c0c0c0;
+        }
+
+        .accordion-section .accordion-content {
+            border: 1px inset #c0c0c0;
+            border-top: none;
+            padding: 12px;
+            display: none; /* Maintient le comportement legacy */
+        }
+
+        /* Responsive accordion pour mobile */
+        @media (max-width: 480px) {
+            .accordion-header {
+                font-size: 12px;
+                padding: 10px;
+            }
+            
+            .accordion-icon {
+                font-size: 14px;
+                width: 20px;
+            }
+            
+            .accordion-content {
+                font-size: 12px;
+            }
+            
+            .accordion-content-inner {
+                padding: 10px;
+            }
+        }
+
+        /* ===== STYLES DE BASE ===== */
         body {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'MS Sans Serif', sans-serif;
             font-size: 11px;
-            background: url('img/wallhaven-0j1rqw.jpg') no-repeat center center fixed;
+            background: url('../../img/wallhaven-0j1rqw.jpg') no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             overflow: hidden;

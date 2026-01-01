@@ -51,7 +51,7 @@ function initializeStartMenu() {
             
             // Gestion spéciale pour le calendrier
             if (modalData === 'calendar') {
-                openModal('calendar-modal', 'components/calendar/calendar-content.html', 'Calendrier', 420, 480);
+                createDynamicModal('calendar-modal', 'components/calendar/calendar-content.html', '📅 Calendrier', 420, 480);
             } else {
                 const modalId = modalData + '-modal';
                 openModal(modalId);
@@ -139,7 +139,7 @@ function initializeDateTimeClick() {
             }
             
             console.log('🖱️ Ouverture calendrier depuis taskbar');
-            openModal('calendar-modal', 'components/calendar/calendar-content.html', '📅 Calendrier', 420, 480);
+            createDynamicModal('calendar-modal', 'components/calendar/calendar-content.html', '📅 Calendrier', 420, 480);
         });
         
         console.log('✅ Event listener ajouté sur datetime pour calendrier');

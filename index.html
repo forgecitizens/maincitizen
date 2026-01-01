@@ -65,73 +65,78 @@
         <div class="start-menu-item" data-modal="calendar">📅 Calendrier</div>
     </div>
 
-    <!-- Modals -->
-    <div class="modal" id="contact-modal">
-        <div class="modal-header">
-            <div class="modal-title">Contact</div>
-            <div class="modal-controls">
-                <div class="modal-button" onclick="minimizeModal('contact-modal')">_</div>
-                <div class="modal-button" onclick="maximizeModal('contact-modal')">□</div>
-                <div class="modal-button" onclick="closeModal('contact-modal')">×</div>
+    <!-- Contact Modal - PILOTE nouvelle structure -->
+    <div class="window" id="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contact-title">
+        <div class="window-titlebar">
+            <div class="window-title" id="contact-title">Contact</div>
+            <div class="window-controls">
+                <div class="window-button" onclick="minimizeModal('contact-modal')" aria-label="Réduire">_</div>
+                <div class="window-button" onclick="maximizeModal('contact-modal')" aria-label="Agrandir">□</div>
+                <div class="window-button" onclick="closeModal('contact-modal')" aria-label="Fermer">×</div>
             </div>
         </div>
-        <div class="modal-content">
-            <!-- Mes coordonnées -->
-            <div style="background: #f0f0f0; border: 1px inset #c0c0c0; padding: 16px; margin-bottom: 16px;">
-                <h3 style="margin: 0 0 12px 0; color: #000080; font-size: 14px;">Mes coordonnées</h3>
-                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                    <span style="font-weight: bold; margin-right: 8px;">👤</span>
-                    <span style="font-size: 12px;">Andrei Eleodor Sirbu</span>
+        <div class="window-body">
+            <div class="window-content">
+                <!-- Mes coordonnées -->
+                <div class="info-section">
+                    <h3 class="section-title">Mes coordonnées</h3>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <span class="contact-icon">👤</span>
+                            <span class="contact-text">Andrei Eleodor Sirbu</span>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">📧</span>
+                            <a href="mailto:eleodorandrei@gmail.com" class="contact-link">eleodorandrei@gmail.com</a>
+                        </div>
+                        <div class="contact-item">
+                            <span class="contact-icon">💼</span>
+                            <a href="https://www.linkedin.com/in/andrei-eleodor-sirbu/" target="_blank" rel="noopener noreferrer" class="contact-link">LinkedIn Profile</a>
+                        </div>
+                    </div>
                 </div>
-                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                    <span style="font-weight: bold; margin-right: 8px;">📧</span>
-                    <a href="mailto:eleodorandrei@gmail.com" style="color: #0000ff; text-decoration: underline; font-size: 12px;">eleodorandrei@gmail.com</a>
-                </div>
-                <div style="display: flex; align-items: center;">
-                    <span style="font-weight: bold; margin-right: 8px;">💼</span>
-                    <a href="https://www.linkedin.com/in/andrei-eleodor-sirbu/" target="_blank" rel="noopener noreferrer" style="color: #0000ff; text-decoration: underline; font-size: 12px;">LinkedIn Profile</a>
-                </div>
-            </div>
 
-            <!-- Formulaire de contact -->
-            <div style="background: #f0f0f0; border: 1px inset #c0c0c0; padding: 16px;">
-                <h3 style="margin: 0 0 16px 0; color: #000080; font-size: 14px;">Envoyez-moi un message</h3>
-                <form id="contactForm" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; gap: 12px;">
-                        <div style="flex: 1;">
-                            <label style="display: block; margin-bottom: 4px; font-size: 11px; font-weight: bold;">Prénom :</label>
-                            <input type="text" id="firstName" required style="width: 100%; padding: 4px; border: 1px inset #c0c0c0; font-size: 11px; font-family: 'MS Sans Serif', sans-serif;">
+                <!-- Formulaire de contact -->
+                <div class="form-section">
+                    <h3 class="section-title">Envoyez-moi un message</h3>
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-row">
+                            <div class="form-field">
+                                <label class="field-label">Prénom :</label>
+                                <input type="text" id="firstName" required class="field-input">
+                            </div>
+                            <div class="form-field">
+                                <label class="field-label">Nom :</label>
+                                <input type="text" id="lastName" required class="field-input">
+                            </div>
                         </div>
-                        <div style="flex: 1;">
-                            <label style="display: block; margin-bottom: 4px; font-size: 11px; font-weight: bold;">Nom :</label>
-                            <input type="text" id="lastName" required style="width: 100%; padding: 4px; border: 1px inset #c0c0c0; font-size: 11px; font-family: 'MS Sans Serif', sans-serif;">
+                        
+                        <div class="form-field">
+                            <label class="field-label">Adresse email :</label>
+                            <input type="email" id="email" required class="field-input">
                         </div>
-                    </div>
+                        
+                        <div class="form-field">
+                            <label class="field-label">Message :</label>
+                            <textarea id="message" required rows="6" class="field-textarea"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="action-button primary">📧 Envoyer</button>
+                            <button type="reset" class="action-button secondary">🗑️ Effacer</button>
+                        </div>
+                    </form>
                     
-                    <div>
-                        <label style="display: block; margin-bottom: 4px; font-size: 11px; font-weight: bold;">Adresse email :</label>
-                        <input type="email" id="email" required style="width: 100%; padding: 4px; border: 1px inset #c0c0c0; font-size: 11px; font-family: 'MS Sans Serif', sans-serif;">
+                    <!-- Message de confirmation -->
+                    <div id="contactMessage" style="display: none; margin-top: 12px; padding: 8px; background: #90ee90; border: 1px solid #008000; font-size: 11px;">
+                        ✅ Votre message a été envoyé avec succès !
                     </div>
-                    
-                    <div>
-                        <label style="display: block; margin-bottom: 4px; font-size: 11px; font-weight: bold;">Message :</label>
-                        <textarea id="message" required rows="6" style="width: 100%; padding: 4px; border: 1px inset #c0c0c0; font-size: 11px; font-family: 'MS Sans Serif', sans-serif; resize: vertical;"></textarea>
-                    </div>
-                    
-                    <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-                        <button type="submit" style="padding: 6px 16px; background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%); border: 1px outset #c0c0c0; font-size: 11px; font-family: 'MS Sans Serif', sans-serif; cursor: pointer;">
-                            📧 Envoyer
-                        </button>
-                    </div>
-                </form>
-                
-                <!-- Message de confirmation -->
-                <div id="contactMessage" style="display: none; margin-top: 12px; padding: 8px; background: #90ee90; border: 1px solid #008000; font-size: 11px;">
-                    ✅ Votre message a été envoyé avec succès !
                 </div>
             </div>
         </div>
-        <div class="resize-handle"></div>
+        <div class="window-footer">
+            <div class="status-text">Prêt à envoyer</div>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
     </div>
 
     <div class="modal" id="trash-modal">
@@ -299,65 +304,69 @@
                 </div>
             </div>
 
-            <!-- Collapsible Sections will be added here -->
+            <!-- Sections accordéon modernisées -->
+            <div class="accordion-container">
             
-            <!-- Section 2 - Vulgarisation (Accordion) -->
-            <div class="accordion-section" style="margin-bottom: 12px;">
-                <div class="accordion-header" onclick="toggleAccordion('vulgarisation-section')" style="background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%); border: 1px outset #c0c0c0; padding: 8px 12px; cursor: pointer; font-weight: bold; font-size: 11px; display: flex; align-items: center; justify-content: space-between; font-family: 'MS Sans Serif', sans-serif;">
-                    <span>📖 Vulgarisation</span>
-                    <span id="vulgarisation-toggle" style="font-family: monospace; font-size: 14px;">+</span>
-                </div>
-                <div id="vulgarisation-section" class="accordion-content" style="display: none; background: #ffffff; border: 1px inset #c0c0c0; border-top: none; padding: 12px; font-size: 11px; line-height: 1.4; font-family: 'MS Sans Serif', sans-serif;">
-                    
-                    <!-- Idée centrale -->
-                    <div style="margin-bottom: 16px;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #000080; border-bottom: 1px solid #c0c0c0; padding-bottom: 2px;">Idée centrale</h4>
-                        <p style="margin: 0 0 8px 0;">
-                            À l'origine, il n'existe ni temps, ni espace, ni matière. Seulement un état de « chaos absolu » où aucune distinction n'est possible. 
-                            L'univers émerge lorsque des différences commencent spontanément à apparaître dans ce chaos, créant les premières structures.
-                        </p>
-                        <p style="margin: 0;">
-                            Ces structures naissantes génèrent l'irréversibilité — et c'est cette irréversibilité qui fait naître le temps tel que nous le connaissons. 
-                            Contrairement aux modèles traditionnels, le temps n'existe pas « avant » : il émerge avec l'organisation de l'univers.
-                        </p>
+                <!-- Section Vulgarisation -->
+                <div class="accordion-item">
+                    <div class="accordion-header" tabindex="0">
+                        <span>📖 Vulgarisation</span>
+                        <span class="accordion-icon">▼</span>
                     </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            
+                            <!-- Idée centrale -->
+                            <div style="margin-bottom: 16px;">
+                                <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #000080; border-bottom: 1px solid #c0c0c0; padding-bottom: 2px;">Idée centrale</h4>
+                                <p style="margin: 0 0 8px 0;">
+                                    À l'origine, il n'existe ni temps, ni espace, ni matière. Seulement un état de « chaos absolu » où aucune distinction n'est possible. 
+                                    L'univers émerge lorsque des différences commencent spontanément à apparaître dans ce chaos, créant les premières structures.
+                                </p>
+                                <p style="margin: 0;">
+                                    Ces structures naissantes génèrent l'irréversibilité — et c'est cette irréversibilité qui fait naître le temps tel que nous le connaissons. 
+                                    Contrairement aux modèles traditionnels, le temps n'existe pas « avant » : il émerge avec l'organisation de l'univers.
+                                </p>
+                            </div>
 
-                    <!-- Pourquoi ce modèle ? -->
-                    <div style="margin-bottom: 16px;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #000080; border-bottom: 1px solid #c0c0c0; padding-bottom: 2px;">Pourquoi ce modèle ?</h4>
-                        <p style="margin: 0 0 8px 0;">
-                            Les modèles cosmologiques actuels supposent souvent des conditions initiales très spéciales ou des « réglages fins » 
-                            pour expliquer pourquoi l'univers fonctionne comme il le fait. Ce modèle propose une alternative : l'univers s'auto-organise 
-                            naturellement sans avoir besoin de conditions particulières au départ.
-                        </p>
-                        <p style="margin: 0;">
-                            L'auto-régulation émerge des interactions entre les structures cosmiques elles-mêmes, créant un équilibre dynamique 
-                            qui explique à la fois la complexité observée et la stabilité à grande échelle de notre cosmos.
-                        </p>
-                    </div>
+                            <!-- Pourquoi ce modèle ? -->
+                            <div style="margin-bottom: 16px;">
+                                <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #000080; border-bottom: 1px solid #c0c0c0; padding-bottom: 2px;">Pourquoi ce modèle ?</h4>
+                                <p style="margin: 0 0 8px 0;">
+                                    Les modèles cosmologiques actuels supposent souvent des conditions initiales très spéciales ou des « réglages fins » 
+                                    pour expliquer pourquoi l'univers fonctionne comme il le fait. Ce modèle propose une alternative : l'univers s'auto-organise 
+                                    naturellement sans avoir besoin de conditions particulières au départ.
+                                </p>
+                                <p style="margin: 0;">
+                                    L'auto-régulation émerge des interactions entre les structures cosmiques elles-mêmes, créant un équilibre dynamique 
+                                    qui explique à la fois la complexité observée et la stabilité à grande échelle de notre cosmos.
+                                </p>
+                            </div>
 
-                    <!-- Ce que ce modèle ne prétend pas faire -->
-                    <div style="margin-bottom: 0;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #000080; border-bottom: 1px solid #c0c0c0; padding-bottom: 2px;">Ce que ce modèle ne prétend pas faire</h4>
-                        <p style="margin: 0 0 8px 0;">
-                            Ce travail ne cherche pas à remplacer la physique établie ou à prédire de nouvelles observations précises. 
-                            Il s'agit plutôt d'un cadre conceptuel pour repenser les questions fondamentales sur l'origine et l'organisation cosmique.
-                        </p>
-                        <p style="margin: 0;">
-                            L'objectif n'est pas non plus de proposer une « théorie du tout », mais d'explorer comment des concepts comme 
-                            l'émergence, l'irréversibilité et l'auto-organisation peuvent éclairer notre compréhension de l'univers primordial.
-                        </p>
+                            <!-- Ce que ce modèle ne prétend pas faire -->
+                            <div style="margin-bottom: 0;">
+                                <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #000080; border-bottom: 1px solid #c0c0c0; padding-bottom: 2px;">Ce que ce modèle ne prétend pas faire</h4>
+                                <p style="margin: 0 0 8px 0;">
+                                    Ce travail ne cherche pas à remplacer la physique établie ou à prédire de nouvelles observations précises. 
+                                    Il s'agit plutôt d'un cadre conceptuel pour repenser les questions fondamentales sur l'origine et l'organisation cosmique.
+                                </p>
+                                <p style="margin: 0;">
+                                    L'objectif n'est pas non plus de proposer une « théorie du tout », mais d'explorer comment des concepts comme 
+                                    l'émergence, l'irréversibilité et l'auto-organisation peuvent éclairer notre compréhension de l'univers primordial.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Section 3 - Recherche & téléchargements (Accordion) -->
-            <div class="accordion-section" style="margin-bottom: 12px;">
-                <div class="accordion-header" onclick="toggleAccordion('research-section')" style="background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%); border: 1px outset #c0c0c0; padding: 8px 12px; cursor: pointer; font-weight: bold; font-size: 11px; display: flex; align-items: center; justify-content: space-between; font-family: 'MS Sans Serif', sans-serif;">
-                    <span>🔬 Recherche & téléchargements</span>
-                    <span id="research-toggle" style="font-family: monospace; font-size: 14px;">+</span>
-                </div>
-                <div id="research-section" class="accordion-content" style="display: none; background: #ffffff; border: 1px inset #c0c0c0; border-top: none; padding: 12px; font-size: 11px; line-height: 1.4; font-family: 'MS Sans Serif', sans-serif;">
+                
+                <!-- Section Recherche -->
+                <div class="accordion-item">
+                    <div class="accordion-header" tabindex="0">
+                        <span>🔬 Recherche & téléchargements</span>
+                        <span class="accordion-icon">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
                     
                     <!-- Downloads Area -->
                     <div style="background: #f8f8f8; border: 1px inset #c0c0c0; padding: 12px; margin-bottom: 16px;">

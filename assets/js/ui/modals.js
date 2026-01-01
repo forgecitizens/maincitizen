@@ -1,4 +1,4 @@
-// Modal functions
+// Modal/Window functions - Support both old modal and new window systems
 function openModal(modalId, htmlFile = null, title = null, width = null, height = null) {
     console.log('🔍 Opening modal:', { modalId, htmlFile, title, width, height });
     
@@ -8,65 +8,172 @@ function openModal(modalId, htmlFile = null, title = null, width = null, height 
         return;
     }
     
-    // Sinon, utiliser l'ancienne méthode pour les modales HTML statiques
-    const modal = document.getElementById(modalId);
-    console.log('Attempting to open modal:', modalId, modal); // Debug log
+    // Chercher d'abord dans le nouveau système .window
+    let modal = document.getElementById(modalId);
+    const isNewWindow = modal && modal.classList.contains('window');
+    
+    console.log('Modal found:', modalId, modal, 'isNewWindow:', isNewWindow);
+    
     if (modal) {
         modal.classList.add('show');
-        modal.style.display = 'block';
+        modal.style.display = isNewWindow ? 'flex' : 'block';
         
-        // Use provided dimensions or calculate 80% of screen size
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight - 28; // Subtract taskbar height
-        const modalWidth = width || Math.floor(screenWidth * 0.8);
-        const modalHeight = height || Math.floor(screenHeight * 0.8);
+        // Sizing moderne pour les nouvelles fenêtres
+        if (isNewWindow) {
+            applyModernWindowSizing(modal, width, height);
+        } else {
+            // Ancien système de sizing pour rétrocompatibilité
+            applyLegacyModalSizing(modal, width, height);
+        }
         
-        // Center the modal
-        const leftPos = Math.floor((screenWidth - modalWidth) / 2);
-        const topPos = Math.floor((screenHeight - modalHeight) / 2);
-        
-        modal.style.left = leftPos + 'px';
-        modal.style.top = topPos + 'px';
-        modal.style.width = modalWidth + 'px';
-        modal.style.height = modalHeight + 'px';
         bringToFront(modal);
         
-        // Initialiser ScrollArea pour les modales statiques
+        // Accessibilité et focus management
+        setupModalAccessibility(modal, isNewWindow);
+        
+        // Initialisation ScrollArea différée
         setTimeout(() => {
-            console.log(`🔍 Initialisation ScrollArea pour modale ${modalId}...`);
-            if (typeof initializeScrollAreas === 'function') {
-                initializeScrollAreas();
-            }
-            
-            // Force initialization on the modal content directly
-            const modalContent = modal.querySelector('.modal-content');
-            if (modalContent && !modalContent.classList.contains('scrollarea')) {
-                try {
-                    if (!modalContent.id) {
-                        modalContent.id = `modal-content-${modalId}`;
-                    }
-                    new ScrollArea(`#${modalContent.id}`);
-                    console.log(`✅ ScrollArea forcé pour #${modalContent.id}`);
-                } catch (error) {
-                    console.error(`❌ Erreur ScrollArea forcé:`, error);
-                }
-            }
+            initializeModalScrollArea(modal, modalId, isNewWindow);
         }, 200);
         
-        console.log('Modal opened successfully'); // Debug log
+        console.log('Modal opened successfully');
     } else {
-        console.error('Modal not found:', modalId); // Debug log
+        console.error('Modal not found:', modalId);
+    }
+}
+
+// Sizing moderne pour .window
+function applyModernWindowSizing(modal, width, height) {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight - 28; // Subtract taskbar
+    
+    // Mobile : utilise les règles CSS responsive
+    if (screenWidth < 1024) {
+        modal.style.left = '8px';
+        modal.style.top = '8px';
+        return; // CSS gère le reste
+    }
+    
+    // Desktop : sizing intelligent
+    const defaultWidth = Math.min(540, Math.floor(screenWidth * 0.92));
+    const defaultHeight = Math.min(480, Math.floor(screenHeight * 0.86));
+    
+    const modalWidth = width || defaultWidth;
+    const modalHeight = height || defaultHeight;
+    
+    // Respecter les contraintes min/max
+    const finalWidth = Math.max(320, Math.min(modalWidth, Math.floor(screenWidth * 0.95)));
+    const finalHeight = Math.max(240, Math.min(modalHeight, Math.floor(screenHeight * 0.90)));
+    
+    // Centrage
+    const leftPos = Math.floor((screenWidth - finalWidth) / 2);
+    const topPos = Math.floor((screenHeight - finalHeight) / 2);
+    
+    modal.style.left = leftPos + 'px';
+    modal.style.top = topPos + 'px';
+    modal.style.width = finalWidth + 'px';
+    modal.style.height = finalHeight + 'px';
+    
+    console.log(`🪟 Window moderne: ${finalWidth}x${finalHeight} at (${leftPos},${topPos})`);
+}
+
+// Sizing legacy pour .modal (rétrocompatibilité)
+function applyLegacyModalSizing(modal, width, height) {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight - 28;
+    const modalWidth = width || Math.floor(screenWidth * 0.8);
+    const modalHeight = height || Math.floor(screenHeight * 0.8);
+    
+    const leftPos = Math.floor((screenWidth - modalWidth) / 2);
+    const topPos = Math.floor((screenHeight - modalHeight) / 2);
+    
+    modal.style.left = leftPos + 'px';
+    modal.style.top = topPos + 'px';
+    modal.style.width = modalWidth + 'px';
+    modal.style.height = modalHeight + 'px';
+    
+    console.log(`📄 Modal legacy: ${modalWidth}x${modalHeight}`);
+}
+
+// Accessibilité et focus management
+function setupModalAccessibility(modal, isNewWindow) {
+    // Focus trap basique
+    const focusableElements = modal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    
+    if (focusableElements.length > 0) {
+        focusableElements[0].focus();
+    }
+    
+    // Gestion Escape key
+    function handleEscape(e) {
+        if (e.key === 'Escape') {
+            closeModal(modal.id);
+            document.removeEventListener('keydown', handleEscape);
+        }
+    }
+    document.addEventListener('keydown', handleEscape);
+    
+    // Stocker la référence pour cleanup
+    modal._escapeHandler = handleEscape;
+}
+
+// ScrollArea initialization pour modales/windows
+function initializeModalScrollArea(modal, modalId, isNewWindow) {
+    console.log(`🔍 Init ScrollArea pour ${modalId} (isNewWindow: ${isNewWindow})`);
+    
+    if (typeof initializeScrollAreas === 'function') {
+        initializeScrollAreas();
+    }
+    
+    // Pour les nouvelles fenêtres, pas de ScrollArea custom - utilise overflow: auto natif
+    if (isNewWindow) {
+        console.log(`✅ Window moderne: scroll natif activé pour ${modalId}`);
+        return;
+    }
+    
+    // Pour les anciennes modales, garde le système ScrollArea custom
+    const modalContent = modal.querySelector('.modal-content');
+    if (modalContent && !modalContent.classList.contains('scrollarea')) {
+        try {
+            if (!modalContent.id) {
+                modalContent.id = `modal-content-${modalId}`;
+            }
+            new ScrollArea(`#${modalContent.id}`);
+            console.log(`✅ ScrollArea custom pour legacy modal #${modalContent.id}`);
+        } catch (error) {
+            console.error(`❌ Erreur ScrollArea legacy:`, error);
+        }
     }
 }
 
 function closeModal(modalId) {
     // Play click sound
-    playClickSound();
+    if (typeof playClickSound === 'function') {
+        playClickSound();
+    }
     
     const modal = document.getElementById(modalId);
     if (modal) {
+        // Cas spécial : démontage du calendrier
+        if (modalId === 'calendar-modal' && typeof unmountCalendar === 'function') {
+            console.log('🧹 Démontage du calendrier...');
+            try {
+                unmountCalendar();
+            } catch (e) {
+                console.warn('Erreur démontage calendrier:', e);
+            }
+        }
+        
         modal.classList.remove('show');
         modal.style.display = 'none';
+        
+        // Cleanup escape handler
+        if (modal._escapeHandler) {
+            document.removeEventListener('keydown', modal._escapeHandler);
+            delete modal._escapeHandler;
+        }
         
         // Remove from minimized windows
         minimizedWindows = minimizedWindows.filter(w => w.id !== modalId);
@@ -116,7 +223,8 @@ function maximizeModal(modalId) {
 }
 
 function bringToFront(modal) {
-    const allModals = document.querySelectorAll('.modal');
+    // Support both .modal and .window systems
+    const allModals = document.querySelectorAll('.modal, .window');
     allModals.forEach(m => m.style.zIndex = '100');
     modal.style.zIndex = '101';
 }
@@ -130,29 +238,44 @@ function createDynamicModal(modalId, htmlFile, title, width = 400, height = 300)
     if (existingModal) {
         // Si elle existe déjà, juste la rouvrir
         existingModal.classList.add('show');
-        existingModal.style.display = 'block';
+        const isNewWindow = existingModal.classList.contains('window');
+        existingModal.style.display = isNewWindow ? 'flex' : 'block';
         bringToFront(existingModal);
+        
+        // Cas spécial : remonter le calendrier s'il a été démonté
+        if (modalId === 'calendar-modal') {
+            setTimeout(() => {
+                const mountPoint = document.getElementById('calendar-mount-point');
+                if (mountPoint && typeof mountCalendar === 'function' && !window.retroCalendar) {
+                    console.log('🔄 Remontage du calendrier...');
+                    mountCalendar(mountPoint, { showClock: true, enableNotes: true, theme: 'retro' });
+                }
+            }, 100);
+        }
+        
         return;
     }
     
-    // Créer la structure HTML de la modale
+    // Créer la structure HTML avec nouveau système .window pour meilleure UX
     const modalHTML = `
-        <div class="modal" id="${modalId}">
-            <div class="modal-header">
-                <div class="modal-title">${title || 'Fenêtre'}</div>
-                <div class="modal-controls">
-                    <div class="modal-button" onclick="minimizeModal('${modalId}')">_</div>
-                    <div class="modal-button" onclick="maximizeModal('${modalId}')">□</div>
-                    <div class="modal-button" onclick="closeModal('${modalId}')">×</div>
+        <div class="window" id="${modalId}" role="dialog" aria-modal="true" aria-labelledby="${modalId}-title">
+            <div class="window-titlebar">
+                <div class="window-title" id="${modalId}-title">${title || 'Fenêtre'}</div>
+                <div class="window-controls">
+                    <div class="window-button" onclick="minimizeModal('${modalId}')" aria-label="Réduire">_</div>
+                    <div class="window-button" onclick="maximizeModal('${modalId}')" aria-label="Agrandir">□</div>
+                    <div class="window-button" onclick="closeModal('${modalId}')" aria-label="Fermer">×</div>
                 </div>
             </div>
-            <div class="modal-content" id="${modalId}-content">
-                <div style="text-align: center; padding: 20px; color: #808080;">
-                    <div style="animation: spin 1s linear infinite; display: inline-block;">⏳</div>
-                    <div>Chargement...</div>
+            <div class="window-body">
+                <div class="window-content" id="${modalId}-content">
+                    <div style="text-align: center; padding: 20px; color: #808080;">
+                        <div style="animation: spin 1s linear infinite; display: inline-block;">⏳</div>
+                        <div>Chargement...</div>
+                    </div>
                 </div>
             </div>
-            <div class="resize-handle"></div>
+            <div class="window-resize-handle" aria-hidden="true"></div>
         </div>
     `;
     
@@ -189,13 +312,8 @@ function createDynamicModal(modalId, htmlFile, title, width = 400, height = 300)
                 console.log(`✅ Contenu chargé pour ${modalId} depuis ${htmlFile}`);
                 console.log(`🔧 ${scripts.length} script(s) réexécuté(s)`);
                 
-                // Initialiser la scrollbar personnalisée pour cette modale
-                setTimeout(() => {
-                    if (typeof initializeScrollAreas === 'function') {
-                        initializeScrollAreas();
-                        console.log(`📜 ScrollArea initialisé pour modale ${modalId}`);
-                    }
-                }, 100);
+                // Pas besoin d'initialiser ScrollArea pour les nouvelles fenêtres
+                console.log(`📅 Window moderne: scroll natif activé pour ${modalId}`);
             }
         })
         .catch(error => {
@@ -213,27 +331,18 @@ function createDynamicModal(modalId, htmlFile, title, width = 400, height = 300)
             }
         });
     
-    // Configurer la modale
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight - 28; // Subtract taskbar height
-    const modalWidth = Math.min(width, screenWidth * 0.9);
-    const modalHeight = Math.min(height, screenHeight * 0.9);
-    
-    // Center the modal
-    const leftPos = Math.floor((screenWidth - modalWidth) / 2);
-    const topPos = Math.floor((screenHeight - modalHeight) / 2);
-    
-    modal.style.left = leftPos + 'px';
-    modal.style.top = topPos + 'px';
-    modal.style.width = modalWidth + 'px';
-    modal.style.height = modalHeight + 'px';
+    // Configurer la modale avec sizing moderne
+    applyModernWindowSizing(modal, width, height);
     
     // Afficher et amener au premier plan
     modal.classList.add('show');
-    modal.style.display = 'block';
+    modal.style.display = 'flex';
     bringToFront(modal);
     
-    console.log(`🪟 Modale dynamique créée: ${modalId} (${modalWidth}x${modalHeight})`);
+    // Accessibilité
+    setupModalAccessibility(modal, true);
+    
+    console.log(`🪟 Modale dynamique créée: ${modalId} (${width}x${height})`);
 }
 
 function initializeModalDragging() {
