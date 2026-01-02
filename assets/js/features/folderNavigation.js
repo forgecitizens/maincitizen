@@ -25,7 +25,7 @@ const fileSystem = {
                 children: {
                     'Machine à écrire': {
                         type: 'file',
-                        icon: '⌨️',
+                        icon: 'img/typewriter.png',
                         action: 'openTypewriter'
                     }
                 }
@@ -239,8 +239,14 @@ function renderFolderContents() {
     let html = '<div class="folder-grid">';
     
     for (const [name, item] of Object.entries(contents)) {
-        const icon = item.icon || (item.type === 'folder' ? '📁' : '📄');
+        const iconValue = item.icon || (item.type === 'folder' ? '📁' : '📄');
         const itemClass = item.type === 'folder' ? 'folder-item' : 'file-item';
+        
+        // Check if icon is an image path or an emoji
+        const isImageIcon = iconValue.includes('/') || iconValue.endsWith('.png') || iconValue.endsWith('.jpg');
+        const iconHtml = isImageIcon 
+            ? `<img src="${iconValue}" alt="${name}" style="width: 32px; height: 32px; object-fit: contain;">`
+            : iconValue;
         
         // For files, encode the item data as JSON attribute
         const itemDataAttr = item.type === 'file' 
@@ -253,7 +259,7 @@ function renderFolderContents() {
         
         html += `
             <div class="${itemClass}" ${onClick} ${itemDataAttr} tabindex="0" role="button" aria-label="${name}">
-                <div class="item-icon">${icon}</div>
+                <div class="item-icon">${iconHtml}</div>
                 <div class="item-label">${name}</div>
             </div>
         `;

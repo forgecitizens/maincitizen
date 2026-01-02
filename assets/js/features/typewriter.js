@@ -13,6 +13,29 @@ const typewriterSounds = {
     space: null
 };
 
+// Sound preferences - stores selected sound files
+let typewriterSoundPreferences = {
+    type: 'sounds/typekey.wav',
+    enter: 'sounds/enterkey.wav',
+    space: 'sounds/spacebarkey.mp3'
+};
+
+// Available sounds for each category
+const typewriterAvailableSounds = {
+    type: [
+        { file: 'sounds/typekey.wav', label: 'typekey.wav' },
+        { file: 'sounds/typekey_1.wav', label: 'typekey_1.wav' },
+        { file: 'sounds/typekey_1A.wav', label: 'typekey_1A.wav' }
+    ],
+    enter: [
+        { file: 'sounds/enterkey.wav', label: 'enterkey.wav' },
+        { file: 'sounds/enterkey_1.wav', label: 'enterkey_1.wav' }
+    ],
+    space: [
+        { file: 'sounds/spacebarkey.mp3', label: 'spacebarkey.mp3' }
+    ]
+};
+
 // Backspace cooldown state
 let lastBackspaceTime = 0;
 const BACKSPACE_COOLDOWN = 3000; // 3 seconds
@@ -31,9 +54,9 @@ async function loadTypewriterSounds() {
     
     try {
         const soundFiles = {
-            type: 'sounds/typekey.wav',
-            enter: 'sounds/enterkey.wav',
-            space: 'sounds/spacebarkey.mp3'
+            type: typewriterSoundPreferences.type,
+            enter: typewriterSoundPreferences.enter,
+            space: typewriterSoundPreferences.space
         };
 
         for (const [key, file] of Object.entries(soundFiles)) {
@@ -47,6 +70,30 @@ async function loadTypewriterSounds() {
         console.log('⌨️ Typewriter sounds loaded');
     } catch (error) {
         console.warn('Could not load typewriter sounds:', error);
+    }
+}
+
+/**
+ * Reload typewriter sounds with new preferences
+ */
+function reloadTypewriterSounds() {
+    try {
+        const soundFiles = {
+            type: typewriterSoundPreferences.type,
+            enter: typewriterSoundPreferences.enter,
+            space: typewriterSoundPreferences.space
+        };
+
+        for (const [key, file] of Object.entries(soundFiles)) {
+            const audio = new Audio(file);
+            audio.preload = 'auto';
+            audio.volume = 0.5;
+            typewriterSounds[key] = audio;
+        }
+        
+        console.log('⌨️ Typewriter sounds reloaded with new preferences');
+    } catch (error) {
+        console.warn('Could not reload typewriter sounds:', error);
     }
 }
 
@@ -108,6 +155,9 @@ function openTypewriter() {
             <div class="typewriter-intro-name">
                 <label for="typewriter-doc-name">Nom du document :</label>
                 <input type="text" id="typewriter-doc-name" placeholder="Sans titre" maxlength="50" />
+            </div>
+            <div class="typewriter-intro-import">
+                <button class="typewriter-intro-btn typewriter-intro-btn-secondary" onclick="typewriterImportMAEFromIntro()">📂 Importer un fichier</button>
             </div>
             <div class="typewriter-intro-footer">
                 <button class="typewriter-intro-btn" onclick="openTypewriterEditor()">Continuer</button>
@@ -219,6 +269,10 @@ function openTypewriterEditor() {
             <div class="typewriter-separator"></div>
             <button class="typewriter-btn typewriter-btn-action" onclick="typewriterExportPDF()" title="Exporter en PDF">
                 📄 PDF
+            </button>
+            <div class="typewriter-separator"></div>
+            <button class="typewriter-btn typewriter-btn-action" onclick="openTypewriterSoundOptions()" title="Options sonores">
+                🔊 Sons
             </button>
         </div>
         <div class="window-content typewriter-content">
@@ -1059,6 +1113,268 @@ function fallbackPDFExport(text) {
     }
 }
 
+/**
+ * Open the sound options popup
+ */
+function openTypewriterSoundOptions() {
+    console.log('🔊 Opening sound options...');
+    
+    // Check if popup already exists
+    let popup = document.getElementById('typewriter-sound-options');
+    
+    if (popup) {
+        popup.classList.add('show');
+        popup.style.display = 'flex';
+        if (typeof bringToFront === 'function') {
+            bringToFront(popup);
+        }
+        return;
+    }
+    
+    // Build the sound options HTML
+    const buildSoundCategory = (categoryKey, categoryLabel, sounds) => {
+        const soundItems = sounds.map(sound => {
+            const isChecked = typewriterSoundPreferences[categoryKey] === sound.file ? 'checked' : '';
+            return `
+                <label class="typewriter-sound-option">
+                    <input type="radio" name="sound-${categoryKey}" value="${sound.file}" ${isChecked} />
+                    <span class="typewriter-sound-label">${sound.label}</span>
+                    <button class="typewriter-sound-preview" onclick="previewTypewriterSound('${sound.file}')" title="Écouter">▶</button>
+                </label>
+            `;
+        }).join('');
+        
+        return `
+            <div class="typewriter-sound-category">
+                <div class="typewriter-sound-category-title">${categoryLabel}</div>
+                ${soundItems}
+            </div>
+        `;
+    };
+    
+    // Create popup
+    popup = document.createElement('div');
+    popup.id = 'typewriter-sound-options';
+    popup.className = 'window typewriter-sound-options-window';
+    popup.setAttribute('role', 'dialog');
+    popup.setAttribute('aria-modal', 'true');
+    
+    popup.innerHTML = `
+        <div class="window-titlebar">
+            <div class="window-title">🔊 Options sonores</div>
+            <div class="window-controls">
+                <div class="window-button" onclick="closeTypewriterSoundOptions()" aria-label="Fermer">×</div>
+            </div>
+        </div>
+        <div class="window-content typewriter-sound-options-content">
+            <div class="typewriter-sound-options-intro">
+                <p>Sélectionnez les effets sonores pour chaque type de touche :</p>
+            </div>
+            ${buildSoundCategory('type', 'Boutons principaux', typewriterAvailableSounds.type)}
+            ${buildSoundCategory('enter', 'Bouton "Entrée"', typewriterAvailableSounds.enter)}
+            ${buildSoundCategory('space', 'Bouton "Espace"', typewriterAvailableSounds.space)}
+            <div class="typewriter-sound-options-footer">
+                <button class="typewriter-sound-accept-btn" onclick="acceptTypewriterSoundOptions()">Accepter</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(popup);
+    
+    // Show popup
+    popup.classList.add('show');
+    popup.style.display = 'flex';
+    
+    // Apply sizing and position
+    popup.style.width = '320px';
+    popup.style.maxWidth = '90vw';
+    popup.style.left = '50%';
+    popup.style.top = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    
+    // Initialize dragging
+    if (typeof initializeSingleModalDragging === 'function') {
+        initializeSingleModalDragging(popup);
+    }
+    
+    // Bring to front
+    if (typeof bringToFront === 'function') {
+        bringToFront(popup);
+    }
+}
+
+/**
+ * Preview a sound
+ */
+function previewTypewriterSound(soundFile) {
+    const audio = new Audio(soundFile);
+    audio.volume = 0.5;
+    audio.play().catch(() => {});
+}
+
+/**
+ * Accept sound options and apply changes
+ */
+function acceptTypewriterSoundOptions() {
+    // Get selected values from radio buttons
+    const typeSound = document.querySelector('input[name="sound-type"]:checked');
+    const enterSound = document.querySelector('input[name="sound-enter"]:checked');
+    const spaceSound = document.querySelector('input[name="sound-space"]:checked');
+    
+    if (typeSound) {
+        typewriterSoundPreferences.type = typeSound.value;
+    }
+    if (enterSound) {
+        typewriterSoundPreferences.enter = enterSound.value;
+    }
+    if (spaceSound) {
+        typewriterSoundPreferences.space = spaceSound.value;
+    }
+    
+    // Reload sounds with new preferences
+    reloadTypewriterSounds();
+    
+    // Close the popup
+    closeTypewriterSoundOptions();
+    
+    console.log('🔊 Sound preferences updated:', typewriterSoundPreferences);
+}
+
+/**
+ * Close the sound options popup
+ */
+function closeTypewriterSoundOptions() {
+    const popup = document.getElementById('typewriter-sound-options');
+    if (popup) {
+        popup.classList.remove('show');
+        popup.style.display = 'none';
+    }
+}
+
+/**
+ * Import a .mae file from the intro popup
+ * Opens the editor first, then triggers the import
+ */
+function typewriterImportMAEFromIntro() {
+    // Play click sound
+    if (typeof playClickSound === 'function') {
+        playClickSound();
+    }
+    
+    // Create file input
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.mae,.json';
+    
+    input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            
+            // Validate file format
+            if (!data.type || data.type !== 'machine-a-ecrire') {
+                alert('Format de fichier invalide. Veuillez sélectionner un fichier .mae valide.');
+                return;
+            }
+            
+            if (!data.content) {
+                alert('Le fichier ne contient pas de contenu.');
+                return;
+            }
+            
+            // Set the document name from the file
+            if (data.title) {
+                typewriterDocumentName = data.title;
+                const nameInput = document.getElementById('typewriter-doc-name');
+                if (nameInput) {
+                    nameInput.value = data.title;
+                }
+            }
+            
+            // Open the editor with the imported content
+            openTypewriterEditorWithContent(data.content, data.title);
+            
+            console.log('✅ MAE file imported from intro:', file.name);
+            
+        } catch (error) {
+            console.error('Import error:', error);
+            alert('Erreur lors de l\'import. Vérifiez que le fichier est valide.');
+        }
+    };
+    
+    input.click();
+}
+
+/**
+ * Open the typewriter editor with pre-loaded content
+ */
+function openTypewriterEditorWithContent(content, title) {
+    console.log('⌨️ Opening typewriter editor with imported content...');
+    
+    // Set document name
+    typewriterDocumentName = title || 'Sans titre';
+    
+    // Close intro popup
+    closeModal('typewriter-intro');
+    
+    // Load sounds on first open
+    loadTypewriterSounds();
+    
+    // Create blur backdrop if it doesn't exist
+    let backdrop = document.getElementById('typewriter-backdrop');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'typewriter-backdrop';
+        backdrop.className = 'typewriter-backdrop';
+        document.body.appendChild(backdrop);
+    }
+    backdrop.classList.add('show');
+    
+    // Check if modal already exists
+    let modal = document.getElementById('typewriter-modal');
+    
+    if (modal) {
+        // Update title with new document name
+        const titleEl = document.getElementById('typewriter-title');
+        if (titleEl) {
+            titleEl.textContent = `⌨️ ${typewriterDocumentName}`;
+        }
+        // Set the content
+        const editor = document.getElementById('typewriter-editor');
+        if (editor) {
+            editor.innerHTML = content;
+        }
+        // Just show existing modal
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+        if (typeof bringToFront === 'function') {
+            bringToFront(modal);
+        }
+        // Update blur viewport
+        setTimeout(updateBlurViewport, 100);
+        return;
+    }
+    
+    // Use the normal editor open function first
+    openTypewriterEditor();
+    
+    // Then set the content after a short delay
+    setTimeout(() => {
+        const editor = document.getElementById('typewriter-editor');
+        if (editor) {
+            editor.innerHTML = content;
+            // Reset backspace cooldown
+            lastBackspaceTime = 0;
+            updateBackspaceStatus();
+            // Update blur viewport
+            updateBlurViewport();
+        }
+    }, 150);
+}
+
 // Expose functions globally
 window.openTypewriter = openTypewriter;
 window.openTypewriterEditor = openTypewriterEditor;
@@ -1066,5 +1382,10 @@ window.typewriterFormat = typewriterFormat;
 window.typewriterExportPDF = typewriterExportPDF;
 window.typewriterExportMAE = typewriterExportMAE;
 window.typewriterImportMAE = typewriterImportMAE;
+window.openTypewriterSoundOptions = openTypewriterSoundOptions;
+window.previewTypewriterSound = previewTypewriterSound;
+window.acceptTypewriterSoundOptions = acceptTypewriterSoundOptions;
+window.closeTypewriterSoundOptions = closeTypewriterSoundOptions;
+window.typewriterImportMAEFromIntro = typewriterImportMAEFromIntro;
 
 console.log('⌨️ Typewriter module loaded');

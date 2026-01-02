@@ -397,7 +397,7 @@
             padding: 0;
             font-family: 'MS Sans Serif', sans-serif;
             font-size: 11px;
-            background: url('../../img/wallhaven-0j1rqw.jpg') no-repeat center center fixed;
+            background: url('../../img/wallhaven-1jlrzg.jpg') no-repeat center center fixed;
             background-size: cover;
             height: 100vh;
             overflow: hidden;
@@ -441,12 +441,23 @@
             width: 32px;
             height: 32px;
             margin-bottom: 4px;
-            background: #c0c0c0;
-            border: 1px outset #c0c0c0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 16px;
+        }
+
+        /* Style pour les icônes emoji (fallback) */
+        div.icon-image {
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+        }
+
+        /* Style pour les icônes images PNG */
+        img.icon-image {
+            background: transparent;
+            border: none;
+            object-fit: contain;
         }
 
         .icon-label {
@@ -1384,6 +1395,21 @@
             background: #fffff8;
         }
         
+        /* Import button section in intro */
+        .typewriter-intro-import {
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        .typewriter-intro-btn-secondary {
+            background: linear-gradient(to bottom, #f0f0f0 0%, #c8c8c8 100%);
+            color: #333;
+        }
+        
+        .typewriter-intro-btn-secondary:hover {
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d8d8d8 100%);
+        }
+
         /* ===== TYPEWRITER BACKDROP BLUR ===== */
         .typewriter-backdrop {
             position: fixed;
@@ -1594,6 +1620,179 @@
             font-weight: bold;
         }
         
+        /* ===== TYPEWRITER SOUND OPTIONS POPUP ===== */
+        .typewriter-sound-options-window {
+            max-width: 320px;
+            background: #c0c0c0;
+            z-index: 10001 !important;
+        }
+        
+        .typewriter-sound-options-content {
+            padding: 16px;
+            background: #fffef0;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        .typewriter-sound-options-intro {
+            margin-bottom: 12px;
+        }
+        
+        .typewriter-sound-options-intro p {
+            margin: 0;
+            color: #000;
+        }
+        
+        .typewriter-sound-category {
+            margin-bottom: 14px;
+            padding: 10px;
+            background: #f0f0e8;
+            border: 1px solid #d0d0c8;
+        }
+        
+        .typewriter-sound-category-title {
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #d0d0c8;
+        }
+        
+        .typewriter-sound-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            cursor: pointer;
+        }
+        
+        .typewriter-sound-option input[type="radio"] {
+            margin: 0;
+            cursor: pointer;
+        }
+        
+        .typewriter-sound-label {
+            flex: 1;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            color: #333;
+        }
+        
+        .typewriter-sound-preview {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 10px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            color: #000;
+        }
+        
+        .typewriter-sound-preview:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+        
+        .typewriter-sound-preview:active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 1px inset #c0c0c0;
+        }
+        
+        .typewriter-sound-options-footer {
+            margin-top: 16px;
+            text-align: center;
+            padding-top: 12px;
+            border-top: 1px solid #d0d0d0;
+        }
+        
+        .typewriter-sound-accept-btn {
+            padding: 8px 28px;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            font-size: 12px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 2px outset #c0c0c0;
+            cursor: pointer;
+            color: #000;
+        }
+        
+        .typewriter-sound-accept-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+        
+        .typewriter-sound-accept-btn:active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 2px inset #c0c0c0;
+        }
+
+        /* ===== RADIO PLAYER ===== */
+        .radio-window {
+            width: auto !important;
+            min-width: 180px;
+            max-width: 200px;
+            background: #c0c0c0;
+        }
+        
+        .radio-content {
+            padding: 8px;
+            background: #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .radio-display {
+            background: #1a3a1a;
+            color: #33ff33;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            padding: 6px 8px;
+            text-align: center;
+            border: 2px inset #000;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 0 0 4px #33ff33;
+        }
+        
+        .radio-controls {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .radio-btn {
+            width: 36px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 14px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 2px outset #c0c0c0;
+            cursor: pointer;
+            color: #000;
+        }
+        
+        .radio-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+        
+        .radio-btn:active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 2px inset #c0c0c0;
+        }
+        
+        .radio-btn-play {
+            width: 44px;
+            font-size: 16px;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 480px) {
             .typewriter-window {
