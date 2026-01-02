@@ -13,21 +13,6 @@ function updateDateTime() {
     document.getElementById('datetime').textContent = `${timeString} ${dateString}`;
 }
 
-// Update battery level randomly
-function updateBattery() {
-    const battery = Math.floor(Math.random() * 20) + 70; // 70-90%
-    document.getElementById('batteryLevel').textContent = `${battery}%`;
-    
-    const batteryIcon = document.querySelector('.battery-icon');
-    if (battery > 50) {
-        batteryIcon.style.background = '#00ff00';
-    } else if (battery > 20) {
-        batteryIcon.style.background = '#ffff00';
-    } else {
-        batteryIcon.style.background = '#ff0000';
-    }
-}
-
 // Start menu functionality
 function initializeStartMenu() {
     document.getElementById('startButton').addEventListener('click', function(e) {
@@ -48,11 +33,20 @@ function initializeStartMenu() {
     document.querySelectorAll('.start-menu-item').forEach(item => {
         item.addEventListener('click', function() {
             const modalData = this.getAttribute('data-modal');
+            const folderPath = this.getAttribute('data-folder-path');
             
+            // Gestion spéciale pour les dossiers (Programmes, etc.)
+            if (folderPath !== null) {
+                if (typeof window.openFolderExplorer === 'function') {
+                    window.openFolderExplorer(folderPath);
+                } else {
+                    console.error('openFolderExplorer not available');
+                }
+            }
             // Gestion spéciale pour le calendrier
-            if (modalData === 'calendar') {
+            else if (modalData === 'calendar') {
                 createDynamicModal('calendar-modal', 'components/calendar/calendar-content.html', '📅 Calendrier', 420, 480);
-            } else {
+            } else if (modalData) {
                 const modalId = modalData + '-modal';
                 openModal(modalId);
             }
@@ -119,11 +113,9 @@ function initializeTaskbar() {
     initializeGlobalHandlers();
     initializeDateTimeClick(); // Ajouter l'événement de clic sur la date/heure
     updateDateTime();
-    updateBattery();
     
     // Set up periodic updates
     setInterval(updateDateTime, 1000);
-    setInterval(updateBattery, 300000); // Update battery every 5 minutes
 }
 
 // Initialize click event on datetime to open calendar

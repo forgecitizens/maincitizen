@@ -16,7 +16,16 @@ function openModal(modalId, htmlFile = null, title = null, width = null, height 
     
     if (modal) {
         modal.classList.add('show');
-        modal.style.display = isNewWindow ? 'flex' : 'block';
+        
+        // Set display mode based on modal type
+        if (isNewWindow) {
+            modal.style.display = 'flex';
+        } else if (modalId === 'file-explorer-modal') {
+            // File explorer needs flex layout for proper structure
+            modal.style.display = 'flex';
+        } else {
+            modal.style.display = 'block';
+        }
         
         // Sizing moderne pour les nouvelles fenêtres
         if (isNewWindow) {
@@ -47,45 +56,108 @@ function applyModernWindowSizing(modal, width, height) {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight - 28; // Subtract taskbar
     
-    // Mobile : utilise les règles CSS responsive
-    if (screenWidth < 1024) {
-        modal.style.left = '8px';
-        modal.style.top = '8px';
-        return; // CSS gère le reste
+    // Mobile (phone): near full-screen
+    if (screenWidth < 480) {
+        modal.style.left = '0';
+        modal.style.top = '0';
+        modal.style.width = '100%';
+        modal.style.height = screenHeight + 'px';
+        return;
     }
     
-    // Desktop : sizing intelligent
-    const defaultWidth = Math.min(540, Math.floor(screenWidth * 0.92));
-    const defaultHeight = Math.min(480, Math.floor(screenHeight * 0.86));
+    // Large phone / small tablet
+    if (screenWidth < 768) {
+        const tabletWidth = Math.floor(screenWidth * 0.95);
+        const tabletHeight = Math.floor(screenHeight * 0.90);
+        modal.style.width = tabletWidth + 'px';
+        modal.style.height = tabletHeight + 'px';
+        modal.style.left = Math.floor((screenWidth - tabletWidth) / 2) + 'px';
+        modal.style.top = Math.floor((screenHeight - tabletHeight) / 2) + 'px';
+        return;
+    }
+    
+    // Tablet / small desktop
+    if (screenWidth < 1024) {
+        const smallWidth = Math.floor(screenWidth * 0.90);
+        const smallHeight = Math.floor(screenHeight * 0.85);
+        modal.style.width = smallWidth + 'px';
+        modal.style.height = smallHeight + 'px';
+        modal.style.left = Math.floor((screenWidth - smallWidth) / 2) + 'px';
+        modal.style.top = Math.floor((screenHeight - smallHeight) / 2) + 'px';
+        return;
+    }
+    
+    // Desktop: intelligent sizing with reasonable defaults
+    const defaultWidth = 560;  // Medium modal default
+    const defaultHeight = 480;
     
     const modalWidth = width || defaultWidth;
     const modalHeight = height || defaultHeight;
     
-    // Respecter les contraintes min/max
-    const finalWidth = Math.max(320, Math.min(modalWidth, Math.floor(screenWidth * 0.95)));
-    const finalHeight = Math.max(240, Math.min(modalHeight, Math.floor(screenHeight * 0.90)));
+    // Respect min/max constraints
+    const minWidth = 320;
+    const minHeight = 200;
+    const maxWidth = Math.floor(screenWidth * 0.90);
+    const maxHeight = Math.floor(screenHeight * 0.85);
     
-    // Centrage
+    const finalWidth = Math.max(minWidth, Math.min(modalWidth, maxWidth));
+    const finalHeight = Math.max(minHeight, Math.min(modalHeight, maxHeight));
+    
+    // Center with slight upward offset (40% from top instead of 50%)
     const leftPos = Math.floor((screenWidth - finalWidth) / 2);
-    const topPos = Math.floor((screenHeight - finalHeight) / 2);
+    const topPos = Math.floor((screenHeight - finalHeight) * 0.4);
     
     modal.style.left = leftPos + 'px';
     modal.style.top = topPos + 'px';
     modal.style.width = finalWidth + 'px';
     modal.style.height = finalHeight + 'px';
     
-    console.log(`🪟 Window moderne: ${finalWidth}x${finalHeight} at (${leftPos},${topPos})`);
+    console.log(`🪟 Window: ${finalWidth}x${finalHeight} at (${leftPos},${topPos})`);
 }
 
 // Sizing legacy pour .modal (rétrocompatibilité)
 function applyLegacyModalSizing(modal, width, height) {
     const screenWidth = window.innerWidth;
     const screenHeight = window.innerHeight - 28;
-    const modalWidth = width || Math.floor(screenWidth * 0.8);
-    const modalHeight = height || Math.floor(screenHeight * 0.8);
     
+    // Mobile (phone): near full-screen
+    if (screenWidth < 480) {
+        modal.style.left = '0';
+        modal.style.top = '0';
+        modal.style.width = '100%';
+        modal.style.height = screenHeight + 'px';
+        return;
+    }
+    
+    // Large phone / small tablet
+    if (screenWidth < 768) {
+        const tabletWidth = Math.floor(screenWidth * 0.95);
+        const tabletHeight = Math.floor(screenHeight * 0.90);
+        modal.style.width = tabletWidth + 'px';
+        modal.style.height = tabletHeight + 'px';
+        modal.style.left = Math.floor((screenWidth - tabletWidth) / 2) + 'px';
+        modal.style.top = Math.floor((screenHeight - tabletHeight) / 2) + 'px';
+        return;
+    }
+    
+    // Tablet / small desktop
+    if (screenWidth < 1024) {
+        const smallWidth = Math.floor(screenWidth * 0.90);
+        const smallHeight = Math.floor(screenHeight * 0.85);
+        modal.style.width = smallWidth + 'px';
+        modal.style.height = smallHeight + 'px';
+        modal.style.left = Math.floor((screenWidth - smallWidth) / 2) + 'px';
+        modal.style.top = Math.floor((screenHeight - smallHeight) / 2) + 'px';
+        return;
+    }
+    
+    // Desktop: 70% instead of 80% for better aesthetics
+    const modalWidth = width || Math.floor(screenWidth * 0.70);
+    const modalHeight = height || Math.floor(screenHeight * 0.75);
+    
+    // Center with slight upward offset
     const leftPos = Math.floor((screenWidth - modalWidth) / 2);
-    const topPos = Math.floor((screenHeight - modalHeight) / 2);
+    const topPos = Math.floor((screenHeight - modalHeight) * 0.4);
     
     modal.style.left = leftPos + 'px';
     modal.style.top = topPos + 'px';
@@ -123,9 +195,8 @@ function setupModalAccessibility(modal, isNewWindow) {
 function initializeModalScrollArea(modal, modalId, isNewWindow) {
     console.log(`🔍 Init ScrollArea pour ${modalId} (isNewWindow: ${isNewWindow})`);
     
-    if (typeof initializeScrollAreas === 'function') {
-        initializeScrollAreas();
-    }
+    // Réinitialiser les accordéons AVANT le ScrollArea pour préserver les event listeners
+    reinitializeModalAccordions(modal);
     
     // Pour les nouvelles fenêtres, pas de ScrollArea custom - utilise overflow: auto natif
     if (isNewWindow) {
@@ -133,19 +204,79 @@ function initializeModalScrollArea(modal, modalId, isNewWindow) {
         return;
     }
     
-    // Pour les anciennes modales, garde le système ScrollArea custom
+    // File explorer has its own scroll handling via folder-content class
+    if (modalId === 'file-explorer-modal') {
+        console.log(`✅ File explorer: scroll natif via folder-content`);
+        return;
+    }
+    
+    // Pour les anciennes modales, initialise le système ScrollArea custom
     const modalContent = modal.querySelector('.modal-content');
-    if (modalContent && !modalContent.classList.contains('scrollarea')) {
+    if (modalContent && !modalContent.classList.contains('scroll-area')) {
         try {
             if (!modalContent.id) {
                 modalContent.id = `modal-content-${modalId}`;
             }
-            new ScrollArea(`#${modalContent.id}`);
-            console.log(`✅ ScrollArea custom pour legacy modal #${modalContent.id}`);
+            new ScrollArea(modalContent);
+            console.log(`✅ ScrollArea custom pour modal #${modalContent.id}`);
         } catch (error) {
-            console.error(`❌ Erreur ScrollArea legacy:`, error);
+            console.error(`❌ Erreur ScrollArea:`, error);
+        }
+    } else if (modalContent && modalContent.classList.contains('scroll-area')) {
+        // Refresh existing ScrollArea if content changed
+        const instance = ScrollArea.get ? ScrollArea.get(modalContent) : null;
+        if (instance) {
+            instance.refresh();
+            console.log(`🔄 ScrollArea refreshed pour modal #${modalContent.id}`);
         }
     }
+}
+
+/**
+ * Réinitialise les accordéons dans une modale spécifique
+ * Nécessaire car ScrollArea peut recréer le DOM et perdre les event listeners
+ */
+function reinitializeModalAccordions(modal) {
+    const accordionHeaders = modal.querySelectorAll('.accordion-header');
+    if (accordionHeaders.length === 0) return;
+    
+    console.log(`🎵 Réinitialisation accordéons dans modale:`, accordionHeaders.length, 'headers');
+    
+    accordionHeaders.forEach(header => {
+        // Éviter de réattacher les listeners si déjà initialisé
+        if (header.dataset.accordionInitialized) return;
+        header.dataset.accordionInitialized = 'true';
+        
+        // Gestionnaire de clic
+        header.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof handleAccordionClick === 'function') {
+                handleAccordionClick(this);
+            }
+        });
+        
+        // Navigation clavier
+        header.addEventListener('keydown', function(e) {
+            if (typeof handleAccordionKeydown === 'function') {
+                handleAccordionKeydown(e, this);
+            }
+        });
+        
+        // Effet visuel lors du press/release
+        header.addEventListener('mousedown', function() {
+            this.classList.add('pressed');
+        });
+        
+        header.addEventListener('mouseup', function() {
+            this.classList.remove('pressed');
+        });
+        
+        header.addEventListener('mouseleave', function() {
+            this.classList.remove('pressed');
+        });
+    });
+    
+    console.log(`✅ Accordéons réinitialisés dans modale`);
 }
 
 function closeModal(modalId) {
@@ -219,6 +350,18 @@ function maximizeModal(modalId) {
             modal.style.left = '0';
             modal.style.top = '0';
         }
+        
+        // Refresh ScrollArea after resize (give time for layout to update)
+        setTimeout(() => {
+            const scrollArea = modal.querySelector('.scroll-area');
+            if (scrollArea && typeof ScrollArea !== 'undefined' && ScrollArea.get) {
+                const instance = ScrollArea.get(scrollArea);
+                if (instance) {
+                    instance.refresh();
+                    console.log('🔄 ScrollArea refreshed after maximize');
+                }
+            }
+        }, 100);
     }
 }
 
@@ -413,6 +556,9 @@ function initializeModalDragging() {
 }
 
 function initializeDesktopIcons() {
+    console.log('🖥️ Initializing desktop icons...');
+    console.log('🔍 window.openFolderExplorer =', typeof window.openFolderExplorer);
+    
     // Desktop icon functionality
     document.querySelectorAll('.desktop-icon').forEach(icon => {
         icon.addEventListener('click', function() {
@@ -423,6 +569,24 @@ function initializeDesktopIcons() {
             document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
             // Select this icon
             this.classList.add('selected');
+            
+            // Check if this is a folder navigation icon
+            const folderPath = this.getAttribute('data-folder-path');
+            console.log('📂 Click on icon, folderPath =', folderPath);
+            console.log('📂 window.openFolderExplorer at click time =', typeof window.openFolderExplorer);
+            
+            if (folderPath !== null) {
+                // Use window.openFolderExplorer to ensure we get the global function
+                if (typeof window.openFolderExplorer === 'function') {
+                    console.log('✅ Calling openFolderExplorer with path:', folderPath);
+                    window.openFolderExplorer(folderPath);
+                } else {
+                    console.error('❌ openFolderExplorer not found, falling back to modal');
+                    const modalId = this.getAttribute('data-modal') + '-modal';
+                    openModal(modalId);
+                }
+                return;
+            }
             
             // Open modal immediately on single click
             const modalId = this.getAttribute('data-modal') + '-modal';

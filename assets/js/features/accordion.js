@@ -30,6 +30,50 @@ function toggleAccordion(sectionId) {
 }
 
 /**
+ * Toggle visibility of details sections (used for chapter details in research modal)
+ */
+function toggleDetails(detailsId) {
+    const details = document.getElementById(detailsId);
+    
+    if (!details) {
+        console.error('Details element not found:', detailsId);
+        return;
+    }
+    
+    // Play click sound
+    if (typeof playClickSound === 'function') {
+        playClickSound();
+    }
+    
+    // Toggle display
+    if (details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'block';
+    } else {
+        details.style.display = 'none';
+    }
+    
+    // Refresh parent ScrollArea after content change
+    setTimeout(() => {
+        refreshParentScrollArea(details);
+    }, 50);
+}
+
+/**
+ * Refresh the ScrollArea containing an element
+ */
+function refreshParentScrollArea(element) {
+    // Find the closest scroll-area container
+    const scrollArea = element.closest('.scroll-area');
+    if (scrollArea && typeof ScrollArea !== 'undefined' && ScrollArea.get) {
+        const instance = ScrollArea.get(scrollArea);
+        if (instance) {
+            instance.refresh();
+            console.log('🔄 ScrollArea refreshed after content change');
+        }
+    }
+}
+
+/**
  * Système d'accordéon moderne avec animations et accessibilité
  */
 function initializeAccordion() {
@@ -37,6 +81,10 @@ function initializeAccordion() {
     
     // Sélectionner tous les headers d'accordéon
     document.querySelectorAll('.accordion-header').forEach(header => {
+        // Éviter de réattacher les listeners si déjà initialisé
+        if (header.dataset.accordionInitialized) return;
+        header.dataset.accordionInitialized = 'true';
+        
         // Ajouter les attributs d'accessibilité
         setupAccordionAccessibility(header);
         
@@ -153,6 +201,11 @@ function openAccordionItem(accordionItem) {
     // Animation d'ouverture
     content.style.height = content.scrollHeight + 'px';
     
+    // Refresh ScrollArea after transition completes (CSS transition is 0.2s)
+    setTimeout(() => {
+        refreshParentScrollArea(accordionItem);
+    }, 250);
+    
     // Focus management
     content.setAttribute('tabindex', '-1');
     
@@ -174,6 +227,11 @@ function closeAccordionItem(accordionItem) {
     
     // Animation de fermeture
     content.style.height = '0px';
+    
+    // Refresh ScrollArea after transition completes
+    setTimeout(() => {
+        refreshParentScrollArea(accordionItem);
+    }, 250);
     
     // Focus management
     content.removeAttribute('tabindex');

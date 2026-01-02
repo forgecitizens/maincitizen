@@ -23,11 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
         playStartupSound();
     });
     
-    // Initialize visitor counter
-    if (typeof initializeVisitorCounter === 'function') {
-        initializeVisitorCounter();
-    }
-    
     // Start testimonial autoplay if testimonials exist
     if (document.querySelectorAll('.testimonial-item').length > 0) {
         if (typeof startTestimonialAutoplay === 'function') {
@@ -138,52 +133,8 @@ function initializeGlobalEventHandlers() {
     });
 }
 
-function initializeScrollAreas() {
-    console.log('🔄 Initialisation des ScrollAreas...');
-    
-    // Initialize ScrollArea for elements that need custom scrollbars
-    const scrollableElements = [
-        '.modal-content',
-        '.accordion-content', 
-        '.project-list',
-        '.skill-list'
-    ];
-    
-    scrollableElements.forEach(selector => {
-        const elements = document.querySelectorAll(selector);
-        console.log(`📋 Trouvé ${elements.length} éléments pour ${selector}`);
-        
-        elements.forEach((element, index) => {
-            // Skip if already initialized
-            if (element.classList.contains('scrollarea')) {
-                console.log(`⏭️ ${selector}[${index}] déjà initialisé`);
-                return;
-            }
-            
-            // Only initialize if element has substantial content or is a modal-content
-            const needsScrollbar = element.scrollHeight > element.clientHeight + 10 || 
-                                 element.classList.contains('modal-content');
-                                 
-            console.log(`📏 ${selector}[${index}]: scrollHeight=${element.scrollHeight}, clientHeight=${element.clientHeight}, needs=${needsScrollbar}`);
-            
-            if (needsScrollbar) {
-                try {
-                    // Give the element a unique ID if it doesn't have one
-                    if (!element.id) {
-                        element.id = `scrollarea-${Date.now()}-${index}`;
-                    }
-                    
-                    new ScrollArea(`#${element.id}`);
-                    console.log(`✅ ScrollArea initialisé pour #${element.id}`);
-                } catch (error) {
-                    console.error(`❌ Erreur initialisation ScrollArea pour ${selector}[${index}]:`, error);
-                }
-            }
-        });
-    });
-    
-    console.log('✅ Initialisation ScrollAreas terminée');
-}
+// initializeScrollAreas is now defined in scrollArea.js
+// This function is kept for compatibility but delegates to the new implementation
 
 function cycleWindows() {
     const openModals = Array.from(document.querySelectorAll('.modal.show'));

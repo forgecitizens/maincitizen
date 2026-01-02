@@ -14,14 +14,14 @@
             <div class="icon-label">Recherches en cosmologie</div>
         </div>
 
-        <div class="desktop-icon" style="top: 120px; left: 20px;" data-modal="contact">
-            <div class="icon-image">📞</div>
-            <div class="icon-label">Contact</div>
+        <div class="desktop-icon" style="top: 120px; left: 20px;" data-modal="file-explorer" data-folder-path="Programmes">
+            <div class="icon-image">📁</div>
+            <div class="icon-label">Programmes</div>
         </div>
 
-        <div class="desktop-icon" style="top: 220px; left: 20px;" data-modal="trash">
-            <div class="icon-image">🗑️</div>
-            <div class="icon-label">Corbeille</div>
+        <div class="desktop-icon" style="top: 220px; left: 20px;" data-modal="contact">
+            <div class="icon-image">📞</div>
+            <div class="icon-label">Contact</div>
         </div>
     </div>
 
@@ -37,14 +37,6 @@
         </div>
 
         <div class="system-tray">
-            <div class="battery">
-                <div class="battery-icon"></div>
-                <span id="batteryLevel">85%</span>
-            </div>
-            <div class="visitor-counter" id="visitorCounter" style="display: flex; align-items: center; gap: 4px; cursor: pointer;" title="Nombre de visiteurs uniques">
-                <span style="font-size: 10px;">👥</span>
-                <span id="visitorCount" style="font-size: 10px; color: #000; font-weight: bold;">...</span>
-            </div>
             <div id="datetime" style="cursor: pointer;" title="Cliquez pour ouvrir le calendrier"></div>
         </div>
     </div>
@@ -52,7 +44,7 @@
 
     <!-- Start Menu -->
     <div class="start-menu" id="startMenu">
-        <div class="start-menu-item" data-modal="programs">Programmes</div>
+        <div class="start-menu-item" data-folder-path="Programmes">Programmes</div>
         <div class="start-menu-item" data-modal="documents">Documents</div>
         <div class="start-menu-item" data-modal="settings">Paramètres</div>
         <div class="start-menu-item" data-modal="search">Rechercher</div>
@@ -137,128 +129,6 @@
             <div class="status-text">Prêt à envoyer</div>
         </div>
         <div class="window-resize-handle" aria-hidden="true"></div>
-    </div>
-
-    <div class="modal" id="trash-modal">
-        <div class="modal-header">
-            <div class="modal-title">Corbeille - Mini-jeu</div>
-            <div class="modal-controls">
-                <div class="modal-button" onclick="maximizeModal('trash-modal')">□</div>
-                <div class="modal-button" onclick="closeModal('trash-modal')">×</div>
-            </div>
-        </div>
-        <div class="modal-content" style="padding: 0; position: relative; overflow: hidden;">
-            <!-- Game UI -->
-            <div style="position: absolute; top: 8px; right: 8px; z-index: 10; background: rgba(192, 192, 192, 0.9); padding: 8px; border: 1px outset #c0c0c0; font-size: 12px; font-weight: bold;">
-                Score: <span id="gameScore">0</span>/<span id="totalPapers">0</span>
-            </div>
-            
-            <div style="position: absolute; top: 8px; left: 8px; z-index: 10;">
-                <button onclick="startNewGame()" style="padding: 4px 8px; background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%); border: 1px outset #c0c0c0; font-size: 11px; cursor: pointer;">
-                    🎮 Nouvelle partie
-                </button>
-            </div>
-            
-            <!-- Game Area -->
-            <div id="gameArea" style="width: 100%; height: 100%; position: relative; background: linear-gradient(to bottom, #e0e0ff 0%, #c0c0e0 100%); min-height: 400px;">
-                <!-- Desk -->
-                <div id="desk" style="position: absolute; bottom: 20px; left: 50px; width: 300px; height: 80px; background: #8B4513; border: 3px solid #654321; border-radius: 8px; z-index: 2;">
-                    <!-- Desk legs -->
-                    <div style="position: absolute; bottom: -60px; left: 20px; width: 15px; height: 60px; background: #654321; border-radius: 4px;"></div>
-                    <div style="position: absolute; bottom: -60px; right: 20px; width: 15px; height: 60px; background: #654321; border-radius: 4px;"></div>
-                    <!-- Computer monitor -->
-                    <div style="position: absolute; top: -40px; left: 50px; width: 80px; height: 50px; background: #2c3e50; border: 2px solid #1a252f; border-radius: 4px;">
-                        <div style="position: absolute; top: 5px; left: 5px; right: 5px; bottom: 15px; background: #34495e; border-radius: 2px;"></div>
-                        <!-- Monitor stand -->
-                        <div style="position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 30px; height: 10px; background: #2c3e50; border-radius: 4px;"></div>
-                    </div>
-                    <!-- Keyboard -->
-                    <div style="position: absolute; top: 15px; left: 40px; width: 60px; height: 20px; background: #ecf0f1; border: 1px solid #bdc3c7; border-radius: 3px;"></div>
-                    <!-- Papers on desk -->
-                    <div style="position: absolute; top: 10px; left: 150px; width: 40px; height: 30px; background: #fff; border: 1px solid #ccc; transform: rotate(15deg);"></div>
-                    <div style="position: absolute; top: 20px; left: 180px; width: 35px; height: 25px; background: #fff; border: 1px solid #ccc; transform: rotate(-10deg);"></div>
-                </div>
-                
-                <!-- Boss Character (sitting) -->
-                <div id="bossCharacter" style="position: absolute; bottom: 80px; left: 120px; width: 160px; height: 200px; z-index: 4;">
-                    <!-- Chair -->
-                    <div style="position: absolute; bottom: -20px; left: 20px; width: 120px; height: 60px; background: #2c3e50; border-radius: 8px; border: 2px solid #1a252f;">
-                        <!-- Chair back -->
-                        <div style="position: absolute; top: -80px; left: 10px; right: 10px; height: 80px; background: #2c3e50; border: 2px solid #1a252f; border-radius: 8px 8px 0 0;"></div>
-                        <!-- Chair legs -->
-                        <div style="position: absolute; bottom: -30px; left: 10px; width: 8px; height: 30px; background: #1a252f; border-radius: 4px;"></div>
-                        <div style="position: absolute; bottom: -30px; right: 10px; width: 8px; height: 30px; background: #1a252f; border-radius: 4px;"></div>
-                    </div>
-                    
-                    <!-- Boss Body (sitting position) -->
-                    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 100px; height: 120px; background: #2c3e50; border-radius: 8px; border: 3px solid #1a252f;"></div>
-                    
-                    <!-- Boss Head -->
-                    <div style="position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: #f4c2a1; border-radius: 50%; border: 3px solid #d4a574;">
-                        <!-- Angry Eyebrows -->
-                        <div style="position: absolute; top: 12px; left: 12px; width: 16px; height: 3px; background: #8b4513; transform: rotate(-20deg);"></div>
-                        <div style="position: absolute; top: 12px; right: 12px; width: 16px; height: 3px; background: #8b4513; transform: rotate(20deg);"></div>
-                        <!-- Eyes (angry/narrowed) -->
-                        <div style="position: absolute; top: 20px; left: 16px; width: 10px; height: 6px; background: #000; border-radius: 50%;"></div>
-                        <div style="position: absolute; top: 20px; right: 16px; width: 10px; height: 6px; background: #000; border-radius: 50%;"></div>
-                        <!-- Nose -->
-                        <div style="position: absolute; top: 32px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background: #d4a574; border-radius: 50%;"></div>
-                        <!-- Frown -->
-                        <div style="position: absolute; top: 48px; left: 50%; transform: translateX(-50%); width: 20px; height: 6px; background: #000; border-radius: 16px 16px 0 0;"></div>
-                        <!-- Hair -->
-                        <div style="position: absolute; top: -8px; left: 8px; right: 8px; height: 24px; background: #8b4513; border-radius: 40px 40px 0 0;"></div>
-                    </div>
-                    
-                    <!-- Arms (on desk) -->
-                    <div style="position: absolute; bottom: 80px; left: 10px; width: 30px; height: 60px; background: #f4c2a1; border-radius: 15px; border: 2px solid #d4a574; transform: rotate(-20deg);"></div>
-                    <div style="position: absolute; bottom: 80px; right: 10px; width: 30px; height: 60px; background: #f4c2a1; border-radius: 15px; border: 2px solid #d4a574; transform: rotate(20deg);"></div>
-                    
-                    <!-- Hands (on desk) -->
-                    <div style="position: absolute; bottom: 50px; left: 15px; width: 20px; height: 20px; background: #f4c2a1; border-radius: 50%; border: 2px solid #d4a574;"></div>
-                    <div style="position: absolute; bottom: 50px; right: 15px; width: 20px; height: 20px; background: #f4c2a1; border-radius: 50%; border: 2px solid #d4a574;"></div>
-                    
-                    <!-- Legs (sitting) -->
-                    <div style="position: absolute; bottom: -10px; left: 25px; width: 25px; height: 80px; background: #34495e; border-radius: 12px;"></div>
-                    <div style="position: absolute; bottom: -10px; right: 25px; width: 25px; height: 80px; background: #34495e; border-radius: 12px;"></div>
-                    
-                    <!-- Shoes -->
-                    <div style="position: absolute; bottom: -15px; left: 20px; width: 35px; height: 15px; background: #000; border-radius: 8px;"></div>
-                    <div style="position: absolute; bottom: -15px; right: 20px; width: 35px; height: 15px; background: #000; border-radius: 8px;"></div>
-                    
-                    <!-- Tie -->
-                    <div style="position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 16px; height: 50px; background: #e74c3c; clip-path: polygon(0 0, 100% 0, 80% 100%, 20% 100%);"></div>
-                    
-                    <!-- Shirt collar -->
-                    <div style="position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); width: 50px; height: 16px; background: #fff; border: 2px solid #ccc; border-radius: 25px 25px 0 0;"></div>
-                </div>
-                
-                <!-- Speech Bubble (hidden by default) -->
-                <div id="speechBubble" style="position: absolute; display: none; z-index: 10; background: white; border: 3px solid #000; border-radius: 20px; padding: 10px 15px; font-size: 16px; font-weight: bold; color: #000;">
-                    <div id="speechText">Aïe !</div>
-                    <!-- Bubble tail -->
-                    <div style="position: absolute; bottom: -15px; left: 30px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 15px solid white;"></div>
-                    <div style="position: absolute; bottom: -12px; left: 33px; width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 12px solid #000;"></div>
-                </div>
-                
-                <!-- Trash Can -->
-                <div id="trashCan" style="position: absolute; bottom: 20px; left: 380px; width: 80px; height: 100px; background: #404040; border: 2px solid #202020; border-radius: 8px 8px 4px 4px; z-index: 5;">
-                    <div style="position: absolute; top: -8px; left: -4px; right: -4px; height: 8px; background: #404040; border: 2px solid #202020; border-radius: 4px;"></div>
-                    <div style="position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; background: #202020; border-radius: 4px;"></div>
-                </div>
-                
-                <!-- Papers will be generated here -->
-            </div>
-            
-            <!-- Game Over Message -->
-            <div id="gameOverMessage" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #c0c0c0; border: 2px outset #c0c0c0; padding: 20px; text-align: center; z-index: 20;">
-                <h3 style="margin: 0 0 10px 0; color: #000080;">🎉 Félicitations !</h3>
-                <p style="margin: 0 0 15px 0;">Félicitations, vous êtes un adepte de la philosophie du clean desk !</p>
-                <button onclick="startNewGame()" style="padding: 6px 12px; background: linear-gradient(to bottom, #c0c0c0 0%, #a0a0a0 100%); border: 1px outset #c0c0c0; font-size: 11px; cursor: pointer;">
-                    🎮 Rejouer
-                </button>
-            </div>
-        </div>
-        <div class="resize-handle"></div>
     </div>
 
     <!-- Simulations Modal -->
@@ -469,9 +339,43 @@
                         Aucune validation expérimentale n'est revendiquée. Les propositions avancées nécessitent 
                         un développement formel approfondi et une analyse critique par la communauté scientifique.
                     </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <!-- End of accordion-container -->
             
+        </div>
+        <div class="resize-handle"></div>
+    </div>
+
+    <!-- File Explorer Modal (for folder navigation) -->
+    <div class="modal" id="file-explorer-modal">
+        <div class="modal-header">
+            <div class="modal-title" id="file-explorer-title">Programmes</div>
+            <div class="modal-controls">
+                <div class="modal-button" onclick="minimizeModal('file-explorer-modal')">_</div>
+                <div class="modal-button" onclick="maximizeModal('file-explorer-modal')">□</div>
+                <div class="modal-button" onclick="closeModal('file-explorer-modal')">×</div>
+            </div>
+        </div>
+        <!-- Breadcrumb Navigation Bar -->
+        <div class="folder-navigation-bar">
+            <button class="nav-button" onclick="navigateBack()" title="Retour" id="nav-back-btn" disabled>
+                <span>◀</span>
+            </button>
+            <button class="nav-button" onclick="navigateUp()" title="Dossier parent" id="nav-up-btn" disabled>
+                <span>▲</span>
+            </button>
+            <div class="breadcrumb-container" id="breadcrumb-container">
+                <span class="breadcrumb-item breadcrumb-root" onclick="navigateToPath('')">🖥️ Bureau</span>
+            </div>
+        </div>
+        <div class="modal-content folder-content" id="file-explorer-content">
+            <!-- Folder contents will be dynamically populated -->
+        </div>
+        <div class="folder-status-bar" id="folder-status-bar">
+            <span id="folder-item-count">0 élément(s)</span>
         </div>
         <div class="resize-handle"></div>
     </div>
@@ -667,14 +571,13 @@
     <!-- Load modules in dependency order -->
     <script defer src="assets/js/core/variables.js"></script>
     <script defer src="assets/js/features/sounds.js"></script>
-    <script defer src="assets/js/features/visitors.js"></script>
     <script defer src="assets/js/ui/taskbar.js"></script>
     <script defer src="assets/js/ui/modals.js"></script>
     <script defer src="assets/js/ui/scrollArea.js"></script>
     <script defer src="components/calendar/calendar.js"></script>
-    <script defer src="assets/js/features/gameTrash.js"></script>
     <script defer src="assets/js/features/contact.js"></script>
     <script defer src="assets/js/features/accordion.js"></script>
+    <script defer src="assets/js/features/folderNavigation.js"></script>
     <script defer src="assets/js/app.js"></script>
 
 
