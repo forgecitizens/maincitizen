@@ -18,6 +18,17 @@ const fileSystem = {
                 children: {
                     // Games will be added here later
                 }
+            },
+            'Outils': {
+                type: 'folder',
+                icon: '🛠️',
+                children: {
+                    'Machine à écrire': {
+                        type: 'file',
+                        icon: '⌨️',
+                        action: 'openTypewriter'
+                    }
+                }
             }
         }
     }
@@ -230,12 +241,18 @@ function renderFolderContents() {
     for (const [name, item] of Object.entries(contents)) {
         const icon = item.icon || (item.type === 'folder' ? '📁' : '📄');
         const itemClass = item.type === 'folder' ? 'folder-item' : 'file-item';
+        
+        // For files, encode the item data as JSON attribute
+        const itemDataAttr = item.type === 'file' 
+            ? `data-file-info='${JSON.stringify(item).replace(/'/g, "&apos;")}'` 
+            : '';
+        
         const onClick = item.type === 'folder' 
             ? `ondblclick="navigateToFolder('${name}')"` 
-            : `ondblclick="openFile('${currentPath.join('/')}/${name}')"`;
+            : `ondblclick="handleFileOpen(this, '${currentPath.join('/')}/${name}')"`;
         
         html += `
-            <div class="${itemClass}" ${onClick} tabindex="0" role="button" aria-label="${name}">
+            <div class="${itemClass}" ${onClick} ${itemDataAttr} tabindex="0" role="button" aria-label="${name}">
                 <div class="item-icon">${icon}</div>
                 <div class="item-label">${name}</div>
             </div>
@@ -308,11 +325,48 @@ function updateNavigationButtons() {
 }
 
 /**
- * Open a file (placeholder for future functionality)
+ * Handle file open from click event - extracts file data and calls openFile
  */
-function openFile(filePath) {
-    console.log('📄 Opening file:', filePath);
-    // To be implemented when files are added
+function handleFileOpen(element, filePath) {
+    let fileData = null;
+    
+    // Try to parse file data from data attribute
+    const fileInfoAttr = element.getAttribute('data-file-info');
+    if (fileInfoAttr) {
+        try {
+            fileData = JSON.parse(fileInfoAttr.replace(/&apos;/g, "'"));
+        } catch (e) {
+            console.warn('Could not parse file info:', e);
+        }
+    }
+    
+    openFile(filePath, fileData);
+}
+
+/**
+ * Open a file - handles file actions based on file type
+ */
+function openFile(filePath, fileData) {
+    console.log('📄 Opening file:', filePath, fileData);
+    
+    // Play click sound
+    if (typeof playClickSound === 'function') {
+        playClickSound();
+    }
+    
+    // Check if file has an action defined
+    if (fileData && fileData.action) {
+        const actionFn = window[fileData.action];
+        if (typeof actionFn === 'function') {
+            actionFn();
+            return;
+        } else {
+            console.warn('Action function not found:', fileData.action);
+        }
+    }
+    
+    // Default behavior - show alert
+    alert(`📄 Fichier: ${filePath}\n\nAucune action définie.`);
 }
 
 /**
@@ -359,6 +413,8 @@ window.navigateBack = navigateBack;
 window.navigateUp = navigateUp;
 window.addFolder = addFolder;
 window.addFile = addFile;
+window.handleFileOpen = handleFileOpen;
+window.openFile = openFile;
 console.log('✅ FolderNavigation: window.openFolderExplorer =', typeof window.openFolderExplorer);
 
 // Initialize on DOM ready

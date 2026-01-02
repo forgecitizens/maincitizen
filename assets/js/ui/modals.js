@@ -297,6 +297,14 @@ function closeModal(modalId) {
             }
         }
         
+        // Cas spécial : retirer le backdrop blur de la machine à écrire
+        if (modalId === 'typewriter-modal') {
+            const backdrop = document.getElementById('typewriter-backdrop');
+            if (backdrop) {
+                backdrop.classList.remove('show');
+            }
+        }
+        
         modal.classList.remove('show');
         modal.style.display = 'none';
         

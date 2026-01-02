@@ -1279,6 +1279,341 @@
             }
         }
 
+        /* ===== TYPEWRITER / MACHINE À ÉCRIRE ===== */
+        
+        /* Typewriter window - fixed size, no resize */
+        .typewriter-window {
+            min-width: 400px;
+            min-height: 300px;
+        }
+        
+        .typewriter-no-resize {
+            resize: none !important;
+        }
+        
+        /* Prevent resize handles on typewriter modal */
+        .typewriter-no-resize::after,
+        .typewriter-no-resize::before {
+            display: none !important;
+        }
+        
+        /* ===== TYPEWRITER INTRO POPUP ===== */
+        .typewriter-intro-window {
+            max-width: 500px;
+            background: #c0c0c0;
+        }
+        
+        .typewriter-intro-content {
+            padding: 20px;
+            background: #fffef0;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .typewriter-intro-text p {
+            margin: 0 0 12px 0;
+            text-align: justify;
+        }
+        
+        .typewriter-intro-text p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .typewriter-intro-text strong {
+            color: #000;
+        }
+        
+        .typewriter-intro-text em {
+            font-style: italic;
+        }
+        
+        .typewriter-intro-footer {
+            margin-top: 20px;
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid #d0d0d0;
+        }
+        
+        .typewriter-intro-btn {
+            padding: 8px 24px;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            font-size: 12px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 2px outset #c0c0c0;
+            cursor: pointer;
+            color: #000;
+        }
+        
+        .typewriter-intro-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+        
+        .typewriter-intro-btn:active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 2px inset #c0c0c0;
+        }
+        
+        /* Document name input */
+        .typewriter-intro-name {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #d0d0d0;
+        }
+        
+        .typewriter-intro-name label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #000;
+        }
+        
+        .typewriter-intro-name input {
+            width: 100%;
+            padding: 6px 8px;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            font-size: 12px;
+            border: 2px inset #c0c0c0;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        
+        .typewriter-intro-name input:focus {
+            outline: none;
+            background: #fffff8;
+        }
+        
+        /* ===== TYPEWRITER BACKDROP BLUR ===== */
+        .typewriter-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9998; /* Just below modals (9999) */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        
+        .typewriter-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Ensure typewriter modal is above backdrop */
+        #typewriter-modal {
+            z-index: 10000 !important;
+        }
+        
+        /* Toolbar */
+        .typewriter-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 6px;
+            background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
+            border-bottom: 1px solid #808080;
+        }
+        
+        .typewriter-btn {
+            min-width: 28px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            font-family: 'MS Sans Serif', serif;
+            font-size: 12px;
+            color: #000;
+        }
+        
+        .typewriter-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+        
+        .typewriter-btn:active,
+        .typewriter-btn.active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 1px inset #c0c0c0;
+        }
+        
+        .typewriter-btn-action {
+            padding: 0 12px;
+            background: linear-gradient(to bottom, #f0f0f0 0%, #c8c8c8 100%);
+        }
+        
+        .typewriter-separator {
+            width: 1px;
+            height: 20px;
+            background: #808080;
+            margin: 0 4px;
+        }
+        
+        /* Editor content area */
+        .typewriter-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 !important;
+            overflow: hidden;
+        }
+        
+        /* Viewport container - holds editor and blur overlay */
+        .typewriter-viewport {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            /* Visual margins to show writing area boundaries */
+            margin: 8px 20px;
+            border-left: 2px solid #cc6666;
+            border-right: 2px solid #cc6666;
+            box-shadow: 
+                inset 3px 0 6px -3px rgba(0, 0, 0, 0.15),
+                inset -3px 0 6px -3px rgba(0, 0, 0, 0.15);
+        }
+        
+        .typewriter-editor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 12px 16px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.6; /* 22.4px line height */
+            background: #fffef0;
+            border: none;
+            outline: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            resize: none;
+            /* Force text wrapping */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+            z-index: 1;
+        }
+        
+        .typewriter-editor:focus {
+            background: #fffff8;
+        }
+        
+        /* Blur overlay system - sits on top of editor but allows clicks through */
+        .typewriter-blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none; /* Allow clicks to pass through to editor */
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Top blur zone */
+        .typewriter-blur-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: rgba(255, 254, 240, 0.7);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            transition: height 0.15s ease-out;
+        }
+        
+        /* Clear zone - no blur, transparent */
+        .typewriter-clear-zone {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 179.2px; /* 8 lines * 22.4px */
+            top: 0;
+            background: transparent;
+            pointer-events: none;
+            /* Add subtle border to show the focus zone */
+            box-shadow: 
+                inset 0 2px 4px -2px rgba(0, 0, 0, 0.1),
+                inset 0 -2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Bottom blur zone */
+        .typewriter-blur-bottom {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 0;
+            background: rgba(255, 254, 240, 0.7);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            transition: height 0.15s ease-out, top 0.15s ease-out;
+        }
+        
+        /* Shake animation for blocked backspace */
+        @keyframes typewriter-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            50% { transform: translateX(4px); }
+            75% { transform: translateX(-4px); }
+        }
+        
+        .typewriter-shake {
+            animation: typewriter-shake 0.2s ease-in-out;
+        }
+        
+        /* Status bar */
+        .typewriter-status {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 2px 8px;
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            font-size: 11px;
+            font-family: 'MS Sans Serif', sans-serif;
+            color: #000;
+            min-height: 20px;
+        }
+        
+        .typewriter-status-warning {
+            color: #cc0000;
+            font-weight: bold;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .typewriter-window {
+                min-width: 280px;
+                min-height: 250px;
+            }
+            
+            .typewriter-editor {
+                font-size: 12px;
+                padding: 8px;
+            }
+            
+            .typewriter-btn {
+                min-width: 24px;
+                height: 24px;
+                padding: 0 6px;
+                font-size: 11px;
+            }
+        }
+        
         /* ===== LEGACY SCROLLAREA STYLES (DEPRECATED) ===== */
         /* Note: Now using .scroll-area, .scroll-content, .scroll-bar classes instead */
         /* Keeping minimal fallback for backwards compatibility */
