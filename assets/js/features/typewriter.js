@@ -15,7 +15,7 @@ const typewriterSounds = {
 
 // Sound preferences - stores selected sound files
 let typewriterSoundPreferences = {
-    type: 'sounds/typekey.wav',
+    type: 'sounds/typekey_1A.wav',
     enter: 'sounds/enterkey.wav',
     space: 'sounds/spacebarkey.mp3'
 };
@@ -156,10 +156,8 @@ function openTypewriter() {
                 <label for="typewriter-doc-name">Nom du document :</label>
                 <input type="text" id="typewriter-doc-name" placeholder="Sans titre" maxlength="50" />
             </div>
-            <div class="typewriter-intro-import">
-                <button class="typewriter-intro-btn typewriter-intro-btn-secondary" onclick="typewriterImportMAEFromIntro()">📂 Importer un fichier</button>
-            </div>
             <div class="typewriter-intro-footer">
+                <button class="typewriter-intro-btn typewriter-intro-btn-secondary" onclick="typewriterImportMAEFromIntro()">📂 Importer un fichier</button>
                 <button class="typewriter-intro-btn" onclick="openTypewriterEditor()">Continuer</button>
             </div>
         </div>
@@ -191,16 +189,30 @@ function openTypewriter() {
 
 /**
  * Open the actual typewriter editor (called from intro popup)
+ * Opens the fullscreen typewriter in a new tab
  */
 function openTypewriterEditor() {
-    console.log('⌨️ Opening typewriter editor...');
+    console.log('⌨️ Opening typewriter fullscreen in new tab...');
     
     // Get document name from input
     const nameInput = document.getElementById('typewriter-doc-name');
     typewriterDocumentName = (nameInput && nameInput.value.trim()) || 'Sans titre';
     
+    // Store data in sessionStorage to pass to the new tab
+    const typewriterData = {
+        title: typewriterDocumentName,
+        content: ''
+    };
+    sessionStorage.setItem('typewriter-data', JSON.stringify(typewriterData));
+    
+    // Open fullscreen typewriter in new tab
+    window.open('typewriter.html', '_blank');
+    
     // Close intro popup
     closeModal('typewriter-intro');
+    
+    console.log('✅ Typewriter fullscreen opened in new tab');
+    return; // Don't execute the rest of the function
     
     // Load sounds on first open
     loadTypewriterSounds();
@@ -1294,10 +1306,21 @@ function typewriterImportMAEFromIntro() {
                 }
             }
             
-            // Open the editor with the imported content
-            openTypewriterEditorWithContent(data.content, data.title);
+            // Store data in sessionStorage to pass to the new tab
+            const typewriterData = {
+                title: data.title || 'Sans titre',
+                content: data.content,
+                previousSession: data.previousSession || null
+            };
+            sessionStorage.setItem('typewriter-data', JSON.stringify(typewriterData));
             
-            console.log('✅ MAE file imported from intro:', file.name);
+            // Open fullscreen typewriter in new tab
+            window.open('typewriter.html', '_blank');
+            
+            // Close intro popup
+            closeModal('typewriter-intro');
+            
+            console.log('✅ MAE file imported and opened in fullscreen:', file.name);
             
         } catch (error) {
             console.error('Import error:', error);

@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine à écrire</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Background layers for smooth transitions */
+        .background-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .background-layer.active {
+            opacity: 1;
+        }
+
+        .background-layer.inactive {
+            opacity: 0;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .typewriter-fullscreen-container {
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+            background: #c0c0c0;
+            border: 2px outset #dfdfdf;
+            box-shadow: 
+                inset 1px 1px 0 #ffffff,
+                inset -1px -1px 0 #808080,
+                4px 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ===== TITLE BAR ===== */
+        .typewriter-titlebar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 4px;
+            background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            min-height: 24px;
+            user-select: none;
+        }
+
+        .typewriter-title-text {
+            padding-left: 4px;
+        }
+
+        .typewriter-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .typewriter-control-btn {
+            width: 18px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .typewriter-control-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        .typewriter-control-btn:active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 1px inset #c0c0c0;
+        }
+
+        /* ===== TOOLBAR ===== */
+        .typewriter-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 6px;
+            background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
+            border-bottom: 1px solid #808080;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .typewriter-toolbar.collapsed {
+            height: 0;
+            padding: 0 6px;
+            border-bottom: none;
+            opacity: 0;
+        }
+
+        .typewriter-btn {
+            min-width: 28px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            font-family: 'MS Sans Serif', serif;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .typewriter-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        .typewriter-btn:active,
+        .typewriter-btn.active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 1px inset #c0c0c0;
+        }
+
+        .typewriter-btn-action {
+            padding: 0 12px;
+            background: linear-gradient(to bottom, #f0f0f0 0%, #c8c8c8 100%);
+        }
+
+        .typewriter-btn img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .typewriter-separator {
+            width: 1px;
+            height: 20px;
+            background: #808080;
+            margin: 0 4px;
+        }
+
+        /* Toggle button for toolbar */
+        .typewriter-toggle-btn {
+            min-width: 24px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            font-size: 10px;
+            color: #000;
+            margin-left: auto;
+        }
+
+        .typewriter-toggle-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        .typewriter-toggle-btn:active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 1px inset #c0c0c0;
+        }
+
+        /* Collapsed toolbar toggle bar */
+        .typewriter-toggle-bar {
+            display: none;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 2px 6px;
+            background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
+            border-bottom: 1px solid #808080;
+        }
+
+        .typewriter-toggle-bar.show {
+            display: flex;
+        }
+
+        /* ===== EDITOR CONTENT ===== */
+        .typewriter-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+            background: #fffef0;
+        }
+
+        .typewriter-viewport {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            margin: 8px 20px;
+            border-left: 2px solid #cc6666;
+            border-right: 2px solid #cc6666;
+            box-shadow: 
+                inset 3px 0 6px -3px rgba(0, 0, 0, 0.15),
+                inset -3px 0 6px -3px rgba(0, 0, 0, 0.15);
+        }
+
+        .typewriter-editor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 12px 16px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            background: #fffef0;
+            border: none;
+            outline: none;
+            overflow-y: auto;
+            overflow-x: hidden;
+            resize: none;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+            z-index: 1;
+        }
+
+        .typewriter-editor:focus {
+            background: #fffff8;
+        }
+
+        /* Blur overlay system */
+        .typewriter-blur-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .typewriter-blur-top {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: rgba(255, 254, 240, 0.7);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            transition: height 0.15s ease-out;
+        }
+
+        .typewriter-clear-zone {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 89.6px;
+            top: 0;
+            background: transparent;
+            pointer-events: none;
+            box-shadow: 
+                inset 0 2px 4px -2px rgba(0, 0, 0, 0.1),
+                inset 0 -2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        .typewriter-blur-bottom {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 0;
+            background: rgba(255, 254, 240, 0.7);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            transition: height 0.15s ease-out, top 0.15s ease-out;
+        }
+
+        /* Shake animation */
+        @keyframes typewriter-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            50% { transform: translateX(4px); }
+            75% { transform: translateX(-4px); }
+        }
+
+        .typewriter-shake {
+            animation: typewriter-shake 0.2s ease-in-out;
+        }
+
+        /* ===== STATUS BAR ===== */
+        .typewriter-status {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 2px 8px;
+            background: #c0c0c0;
+            border-top: 1px solid #808080;
+            font-size: 11px;
+            font-family: 'MS Sans Serif', sans-serif;
+            color: #000;
+            min-height: 20px;
+        }
+
+        .typewriter-status-warning {
+            color: #cc0000;
+            font-weight: bold;
+        }
+
+        /* ===== SOUND OPTIONS MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .sound-options-modal {
+            width: 320px;
+            max-width: 90vw;
+            background: #c0c0c0;
+            border: 2px outset #dfdfdf;
+            box-shadow: 
+                inset 1px 1px 0 #ffffff,
+                inset -1px -1px 0 #808080,
+                4px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-titlebar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 4px;
+            background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .modal-close-btn {
+            width: 18px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .modal-content {
+            padding: 16px;
+            background: #fffef0;
+            font-size: 12px;
+        }
+
+        .sound-category {
+            margin-bottom: 14px;
+            padding: 10px;
+            background: #f0f0e8;
+            border: 1px solid #d0d0c8;
+        }
+
+        .sound-category-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #000;
+        }
+
+        .sound-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            cursor: pointer;
+        }
+
+        .sound-option input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .sound-label {
+            flex: 1;
+        }
+
+        .sound-preview-btn {
+            padding: 2px 8px;
+            font-size: 10px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+        }
+
+        .sound-preview-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        .modal-footer {
+            margin-top: 12px;
+            text-align: center;
+            padding-top: 12px;
+            border-top: 1px solid #d0d0d0;
+        }
+
+        .modal-accept-btn {
+            padding: 8px 24px;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            font-size: 12px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 2px outset #c0c0c0;
+            cursor: pointer;
+            color: #000;
+        }
+
+        .modal-accept-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        /* ===== ENCOURAGEMENT SLIDER ===== */
+        .encouragement-section {
+            margin-top: 14px;
+            padding: 10px;
+            background: #e8f0e8;
+            border: 1px solid #c8d8c8;
+        }
+
+        .encouragement-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .encouragement-description {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 16px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #c0c0c0;
+            border: 2px inset #808080;
+            outline: none;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 20px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+        }
+
+        .slider-container input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 20px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 70px;
+            text-align: right;
+            font-weight: bold;
+            color: #006600;
+        }
+
+        .encouragement-preview {
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* ===== SESSION STATS PANEL ===== */
+        .session-stats-panel {
+            position: absolute;
+            bottom: 20px;
+            right: -70px;
+            width: 70px;
+            height: 180px;
+            background: #e8e8e8;
+            border: 2px solid #808080;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            transition: right 0.3s ease;
+            z-index: 100;
+            box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .session-stats-panel.expanded {
+            right: 0;
+        }
+
+        .session-stats-toggle {
+            position: absolute;
+            left: -16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 40px;
+            background: #e8e8e8;
+            border: 2px solid #808080;
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #cc4444;
+        }
+
+        .session-stats-toggle:hover {
+            background: #d8d8d8;
+        }
+
+        .session-stats-content {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+            padding-bottom: 15px;
+        }
+
+        .stats-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .stats-bar {
+            width: 22px;
+            min-height: 4px;
+            border-radius: 2px 2px 0 0;
+            transition: height 0.3s ease;
+        }
+
+        .stats-bar.previous {
+            background: linear-gradient(to top, #4a3f6b 0%, #6b5b95 100%);
+        }
+
+        .stats-bar.current {
+            background: linear-gradient(to top, #2d8f4e 0%, #4ade80 100%);
+        }
+
+        .stats-label {
+            font-size: 8px;
+            color: #666;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        /* ===== CREDITS PANEL ===== */
+        .credits-panel {
+            position: absolute;
+            bottom: 20px;
+            left: -220px;
+            width: 220px;
+            max-height: 280px;
+            background: #f5f5f0;
+            border: 2px solid #808080;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            display: flex;
+            flex-direction: row;
+            transition: left 0.3s ease;
+            z-index: 100;
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .credits-panel.expanded {
+            left: 0;
+        }
+
+        .credits-toggle {
+            position: absolute;
+            right: -22px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 70px;
+            background: #f5f5f0;
+            border: 2px solid #808080;
+            border-left: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-size: 10px;
+            font-weight: bold;
+            color: #555;
+            letter-spacing: 1px;
+        }
+
+        .credits-toggle:hover {
+            background: #e8e8e0;
+            color: #333;
+        }
+
+        .credits-content {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            font-size: 9px;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .credits-content h4 {
+            font-size: 10px;
+            margin: 0 0 6px 0;
+            color: #000;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 3px;
+        }
+
+        .credits-content h4:not(:first-child) {
+            margin-top: 10px;
+        }
+
+        .credits-content p {
+            margin: 4px 0;
+            word-break: break-word;
+        }
+
+        .credits-content a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .credits-content a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 850px) {
+            .typewriter-fullscreen-container {
+                max-width: 100%;
+                max-height: 100%;
+                border: none;
+                box-shadow: none;
+            }
+        }
+
+        @media (max-height: 650px) {
+            .typewriter-fullscreen-container {
+                max-height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="typewriter-fullscreen-container">
+        <!-- Title Bar -->
+        <div class="typewriter-titlebar">
+            <span class="typewriter-title-text" id="typewriter-title">⌨️ Sans titre</span>
+            <div class="typewriter-controls">
+                <button class="typewriter-control-btn" onclick="window.close()" title="Fermer">×</button>
+            </div>
+        </div>
+
+        <!-- Toolbar (collapsible) -->
+        <div class="typewriter-toolbar" id="typewriter-toolbar">
+            <button class="typewriter-btn" id="tw-bold" onclick="formatText('bold')" title="Gras (Ctrl+B)">
+                <img src="img/bold.png" alt="Gras">
+            </button>
+            <button class="typewriter-btn" id="tw-italic" onclick="formatText('italic')" title="Italique (Ctrl+I)">
+                <img src="img/italics.png" alt="Italique">
+            </button>
+            <button class="typewriter-btn" id="tw-underline" onclick="formatText('underline')" title="Souligné (Ctrl+U)">
+                <img src="img/sousligné.png" alt="Souligné">
+            </button>
+            <div class="typewriter-separator"></div>
+            <button class="typewriter-btn typewriter-btn-action" onclick="openFile()" title="Ouvrir un fichier (.mae)">
+                <img src="img/ouvrir.png" alt="Ouvrir">
+            </button>
+            <button class="typewriter-btn typewriter-btn-action" onclick="saveFile()" title="Enregistrer (.mae)">
+                💾
+            </button>
+            <button class="typewriter-btn typewriter-btn-action" onclick="exportPDF()" title="Exporter en PDF">
+                <img src="img/pdf.png" alt="PDF">
+            </button>
+            <div class="typewriter-separator"></div>
+            <button class="typewriter-btn typewriter-btn-action" onclick="openSoundOptions()" title="Options sonores">
+                <img src="img/soundoptions.png" alt="Sons">
+            </button>
+            <button class="typewriter-toggle-btn" id="toggle-toolbar-btn" onclick="toggleToolbar()" title="Réduire le menu">
+                ▲
+            </button>
+        </div>
+
+        <!-- Toggle bar (shown when toolbar is collapsed) -->
+        <div class="typewriter-toggle-bar" id="typewriter-toggle-bar">
+            <button class="typewriter-toggle-btn" onclick="toggleToolbar()" title="Afficher le menu">
+                ▼
+            </button>
+        </div>
+
+        <!-- Editor Content -->
+        <div class="typewriter-content">
+            <div class="typewriter-viewport" id="typewriter-viewport">
+                <div class="typewriter-editor" 
+                     id="typewriter-editor" 
+                     contenteditable="true" 
+                     role="textbox" 
+                     aria-multiline="true"
+                     aria-label="Zone d'édition"
+                     spellcheck="true"></div>
+                <div class="typewriter-blur-overlay" id="typewriter-blur-overlay">
+                    <div class="typewriter-blur-top"></div>
+                    <div class="typewriter-clear-zone"></div>
+                    <div class="typewriter-blur-bottom"></div>
+                </div>
+            </div>
+            
+            <!-- Session Stats Panel -->
+            <div class="session-stats-panel" id="session-stats-panel">
+                <div class="session-stats-toggle" onclick="toggleSessionStats()" title="Statistiques de session">
+                    ◀
+                </div>
+                <div class="session-stats-content">
+                    <div class="stats-bar-container">
+                        <div class="stats-bar previous" id="previous-session-bar" title="Session précédente: 0 mots"></div>
+                        <div class="stats-label">Préc.</div>
+                    </div>
+                    <div class="stats-bar-container">
+                        <div class="stats-bar current" id="current-session-bar" title="Session actuelle: 0 mots"></div>
+                        <div class="stats-label">Act.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Credits Panel -->
+            <div class="credits-panel" id="credits-panel">
+                <div class="credits-toggle" onclick="toggleCredits()" title="Crédits">
+                    Crédits
+                </div>
+                <div class="credits-content">
+                    <h4>🎧 Sons</h4>
+                    <p>Typewriter Key Press 04 by BryanSaraiva — <a href="https://freesound.org/s/820351/" target="_blank">freesound.org/s/820351</a> — License: Attribution 4.0</p>
+                    <p>Toy Electronic Typewriter Spacebar Press by sprinkleCipher — <a href="https://freesound.org/s/752754/" target="_blank">freesound.org/s/752754</a> — License: CC0</p>
+                    <p>Typewriter BELL.wav by mincedbeats — <a href="https://freesound.org/s/433596/" target="_blank">freesound.org/s/433596</a> — License: CC0</p>
+                    <p>Typewriter.wav by ddohler — <a href="https://freesound.org/s/9098/" target="_blank">freesound.org/s/9098</a> — License: Attribution 4.0</p>
+                    <p>typewriter.wav by Horn — <a href="https://freesound.org/s/9744/" target="_blank">freesound.org/s/9744</a> — License: Attribution NC 3.0</p>
+                    <p>Typewriter Ding.wav by NHumphrey — <a href="https://freesound.org/s/204466/" target="_blank">freesound.org/s/204466</a> — License: CC0</p>
+                    <p>level-up-01.mp3 by shinephoenixstormcrow — <a href="https://freesound.org/s/337049/" target="_blank">freesound.org/s/337049</a> — License: Attribution 3.0</p>
+                    
+                    <h4>🎨 Icônes</h4>
+                    <p>.pdf file icon by <a href="https://icon-icons.com/authors/1293-ifai-iprojectsi" target="_blank">ifai iprojectsi</a></p>
+                    <p>Sound icon by <a href="https://icon-icons.com/authors/260-maria-guillem" target="_blank">Maria Guillem</a></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="typewriter-status">
+            <span id="typewriter-backspace-status">✓ Retour arrière disponible</span>
+        </div>
+    </div>
+
+    <!-- Sound Options Modal -->
+    <div class="modal-overlay" id="sound-modal">
+        <div class="sound-options-modal">
+            <div class="modal-titlebar">
+                <span>🔊 Options sonores</span>
+                <button class="modal-close-btn" onclick="closeSoundOptions()">×</button>
+            </div>
+            <div class="modal-content">
+                <p style="margin-bottom: 12px;">Sélectionnez les effets sonores pour chaque type de touche :</p>
+                
+                <div class="sound-category">
+                    <div class="sound-category-title">Boutons principaux</div>
+                    <label class="sound-option">
+                        <input type="radio" name="sound-type" value="sounds/typekey.wav">
+                        <span class="sound-label">typekey.wav</span>
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/typekey.wav')">▶</button>
+                    </label>
+                    <label class="sound-option">
+                        <input type="radio" name="sound-type" value="sounds/typekey_1.wav">
+                        <span class="sound-label">typekey_1.wav</span>
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/typekey_1.wav')">▶</button>
+                    </label>
+                    <label class="sound-option">
+                        <input type="radio" name="sound-type" value="sounds/typekey_1A.wav" checked>
+                        <span class="sound-label">typekey_1A.wav</span>
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/typekey_1A.wav')">▶</button>
+                    </label>
+                </div>
+                
+                <div class="sound-category">
+                    <div class="sound-category-title">Bouton "Entrée"</div>
+                    <label class="sound-option">
+                        <input type="radio" name="sound-enter" value="sounds/enterkey.wav" checked>
+                        <span class="sound-label">enterkey.wav</span>
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/enterkey.wav')">▶</button>
+                    </label>
+                    <label class="sound-option">
+                        <input type="radio" name="sound-enter" value="sounds/enterkey_1.wav">
+                        <span class="sound-label">enterkey_1.wav</span>
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/enterkey_1.wav')">▶</button>
+                    </label>
+                </div>
+                
+                <div class="sound-category">
+                    <div class="sound-category-title">Bouton "Espace"</div>
+                    <label class="sound-option">
+                        <input type="radio" name="sound-space" value="sounds/spacebarkey.mp3" checked>
+                        <span class="sound-label">spacebarkey.mp3</span>
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/spacebarkey.mp3')">▶</button>
+                    </label>
+                </div>
+                
+                <div class="encouragement-section">
+                    <div class="encouragement-title">🏆 Encouragements</div>
+                    <div class="encouragement-description">
+                        Un son sera joué à chaque fois que vous atteignez ce nombre de mots.
+                    </div>
+                    <div class="slider-container">
+                        <input type="range" id="encouragement-slider" min="1" max="10" value="3" oninput="updateSliderValue()">
+                        <span class="slider-value" id="slider-value">300 mots</span>
+                    </div>
+                    <div class="encouragement-preview">
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/levelup_01.mp3')">▶ Écouter le son</button>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button class="modal-accept-btn" onclick="acceptSoundOptions()">Accepter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================================================
+        // MACHINE À ÉCRIRE - Fullscreen Version
+        // ========================================================================
+
+        // Sound system
+        const sounds = {
+            type: null,
+            enter: null,
+            space: null
+        };
+
+        // Sound preferences - typekey_1A.wav as default
+        let soundPreferences = {
+            type: 'sounds/typekey_1A.wav',
+            enter: 'sounds/enterkey.wav',
+            space: 'sounds/spacebarkey.mp3'
+        };
+
+        // Backspace cooldown
+        let lastBackspaceTime = 0;
+        const BACKSPACE_COOLDOWN = 3000;
+
+        // Document name
+        let documentName = 'Sans titre';
+
+        // Line height for blur calculations
+        const LINE_HEIGHT = 22.4;
+        const VISIBLE_LINES_EACH_SIDE = 2;
+
+        // Toolbar state
+        let toolbarCollapsed = false;
+
+        // Encouragement system
+        let encouragementSound = null;
+        let encouragementThreshold = 300; // Default: 300 words
+        let lastWordMilestone = 0; // Track the last milestone reached
+        let currentWordCount = 0;
+
+        // Session stats
+        let previousSessionWords = 0; // Words from previous session (loaded from file)
+        let sessionStartWords = 0; // Words at the start of current session
+        let sessionStatsExpanded = false;
+        const PIXELS_PER_100_WORDS = 15; // Height in pixels for 100 words
+        const MAX_BAR_HEIGHT = 140; // Maximum bar height in pixels
+
+        // Background system
+        const MAX_BACKGROUNDS = 9; // bg01.png to bg09.png
+        const WORDS_PER_BACKGROUND = 100; // Change background every 100 words
+        let currentBackgroundIndex = 1; // Start with bg01.png
+
+        /**
+         * Initialize the typewriter
+         */
+        function init() {
+            // Initialize background layers
+            initBackgrounds();
+            
+            // Load data from URL parameters or sessionStorage
+            loadInitialData();
+            
+            // Load sounds
+            loadSounds();
+            
+            // Initialize editor
+            initEditor();
+            
+            // Focus editor
+            setTimeout(() => {
+                const editor = document.getElementById('typewriter-editor');
+                if (editor) editor.focus();
+            }, 100);
+        }
+
+        /**
+         * Load initial data from URL params or sessionStorage
+         */
+        function loadInitialData() {
+            // Check sessionStorage for data passed from main page
+            const storedData = sessionStorage.getItem('typewriter-data');
+            if (storedData) {
+                try {
+                    const data = JSON.parse(storedData);
+                    documentName = data.title || 'Sans titre';
+                    
+                    // Update title
+                    const titleEl = document.getElementById('typewriter-title');
+                    if (titleEl) {
+                        titleEl.textContent = `⌨️ ${documentName}`;
+                    }
+                    document.title = documentName + ' - Machine à écrire';
+                    
+                    // Load previous session words if available
+                    if (data.previousSession && typeof data.previousSession.words === 'number') {
+                        previousSessionWords = data.previousSession.words;
+                        console.log(`📊 Previous session: ${previousSessionWords} words`);
+                    }
+                    
+                    // Set content if available
+                    if (data.content) {
+                        const editor = document.getElementById('typewriter-editor');
+                        if (editor) {
+                            editor.innerHTML = data.content;
+                            // Initialize word count and milestone for imported content
+                            setTimeout(() => {
+                                currentWordCount = getWordCount();
+                                sessionStartWords = currentWordCount; // Mark start of new session
+                                lastWordMilestone = Math.floor(currentWordCount / encouragementThreshold);
+                                updateSessionStatsBars();
+                                updateBackground(); // Set correct background for word count
+                                moveCursorToEnd(); // Place cursor at the end
+                                console.log(`📝 Imported document with ${currentWordCount} words`);
+                            }, 100);
+                        }
+                    }
+                    
+                    // Clear sessionStorage after loading
+                    sessionStorage.removeItem('typewriter-data');
+                } catch (e) {
+                    console.warn('Could not parse stored data:', e);
+                }
+            }
+
+            // Check URL params as fallback
+            const urlParams = new URLSearchParams(window.location.search);
+            const title = urlParams.get('title');
+            if (title && documentName === 'Sans titre') {
+                documentName = decodeURIComponent(title);
+                const titleEl = document.getElementById('typewriter-title');
+                if (titleEl) {
+                    titleEl.textContent = `⌨️ ${documentName}`;
+                }
+                document.title = documentName + ' - Machine à écrire';
+            }
+            
+            // Initialize session stats bars
+            setTimeout(updateSessionStatsBars, 150);
+        }
+
+        /**
+         * Load sounds
+         */
+        function loadSounds() {
+            try {
+                for (const [key, file] of Object.entries(soundPreferences)) {
+                    const audio = new Audio(file);
+                    audio.preload = 'auto';
+                    audio.volume = 0.5;
+                    sounds[key] = audio;
+                }
+                
+                // Load encouragement sound
+                encouragementSound = new Audio('sounds/levelup_01.mp3');
+                encouragementSound.preload = 'auto';
+                encouragementSound.volume = 0.7;
+                
+                console.log('⌨️ Sounds loaded');
+            } catch (error) {
+                console.warn('Could not load sounds:', error);
+            }
+        }
+
+        /**
+         * Play a sound
+         */
+        function playSound(type) {
+            const sound = sounds[type];
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(() => {});
+            }
+        }
+
+        /**
+         * Get current word count from editor
+         */
+        function getWordCount() {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor) return 0;
+            
+            const text = editor.innerText || editor.textContent || '';
+            // Split by whitespace and filter out empty strings
+            const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+            return words.length;
+        }
+
+        /**
+         * Check word count and play encouragement sound if milestone reached
+         */
+        function checkWordCount() {
+            currentWordCount = getWordCount();
+            
+            // Calculate which milestone we're at
+            const currentMilestone = Math.floor(currentWordCount / encouragementThreshold);
+            
+            // If we've crossed a new milestone
+            if (currentMilestone > lastWordMilestone && currentWordCount > 0) {
+                lastWordMilestone = currentMilestone;
+                playEncouragementSound();
+                console.log(`🏆 Milestone reached: ${currentWordCount} words!`);
+            }
+            
+            // Update session stats bar
+            updateSessionStatsBars();
+            
+            // Update background based on word count
+            updateBackground();
+        }
+
+        /**
+         * Play the encouragement sound
+         */
+        function playEncouragementSound() {
+            if (encouragementSound) {
+                encouragementSound.currentTime = 0;
+                encouragementSound.play().catch(() => {});
+            }
+        }
+
+        /**
+         * Update slider value display
+         */
+        function updateSliderValue() {
+            const slider = document.getElementById('encouragement-slider');
+            const valueDisplay = document.getElementById('slider-value');
+            if (slider && valueDisplay) {
+                const level = parseInt(slider.value);
+                const words = level * 100; // 100 to 1000 words
+                valueDisplay.textContent = `${words} mots`;
+            }
+        }
+
+        /**
+         * Get the character immediately before the cursor position
+         * Used to determine if backspace should be rate-limited
+         */
+        function getCharacterBeforeCursor() {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return '';
+            
+            const range = selection.getRangeAt(0);
+            
+            // If there's a selection (not just a cursor), treat as non-whitespace
+            if (!range.collapsed) return 'x';
+            
+            // Get the text content before cursor
+            const node = range.startContainer;
+            const offset = range.startOffset;
+            
+            if (node.nodeType === Node.TEXT_NODE) {
+                // We're in a text node, get the character before cursor
+                if (offset > 0) {
+                    return node.textContent.charAt(offset - 1);
+                }
+                // At the start of text node, need to check previous sibling
+                return '';
+            }
+            
+            // We're in an element node
+            if (offset > 0) {
+                const previousNode = node.childNodes[offset - 1];
+                if (previousNode) {
+                    if (previousNode.nodeType === Node.TEXT_NODE) {
+                        const text = previousNode.textContent;
+                        return text.length > 0 ? text.charAt(text.length - 1) : '';
+                    }
+                    // It's an element (like <br>), treat as newline/whitespace
+                    if (previousNode.nodeName === 'BR') return '\n';
+                }
+            }
+            
+            return '';
+        }
+
+        /**
+         * Move cursor to the end of the document
+         */
+        function moveCursorToEnd() {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor) return;
+            
+            // Focus the editor first
+            editor.focus();
+            
+            // Create a range at the end of the content
+            const range = document.createRange();
+            const selection = window.getSelection();
+            
+            // Select the last child or the editor itself
+            if (editor.lastChild) {
+                if (editor.lastChild.nodeType === Node.TEXT_NODE) {
+                    range.setStart(editor.lastChild, editor.lastChild.length);
+                } else {
+                    range.selectNodeContents(editor.lastChild);
+                    range.collapse(false);
+                }
+            } else {
+                range.selectNodeContents(editor);
+                range.collapse(false);
+            }
+            
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            
+            // Scroll to the cursor position
+            const caretY = getCaretYPosition(editor);
+            editor.scrollTop = Math.max(0, caretY - editor.clientHeight / 2);
+            
+            setTimeout(updateBlurViewport, 50);
+        }
+
+        /**
+         * Toggle session stats panel visibility
+         */
+        function toggleSessionStats() {
+            const panel = document.getElementById('session-stats-panel');
+            const toggle = panel.querySelector('.session-stats-toggle');
+            
+            sessionStatsExpanded = !sessionStatsExpanded;
+            
+            if (sessionStatsExpanded) {
+                panel.classList.add('expanded');
+                toggle.innerHTML = '▶';
+            } else {
+                panel.classList.remove('expanded');
+                toggle.innerHTML = '◀';
+            }
+        }
+
+        // Credits panel state
+        let creditsExpanded = false;
+
+        /**
+         * Toggle credits panel visibility
+         */
+        function toggleCredits() {
+            const panel = document.getElementById('credits-panel');
+            
+            creditsExpanded = !creditsExpanded;
+            
+            if (creditsExpanded) {
+                panel.classList.add('expanded');
+            } else {
+                panel.classList.remove('expanded');
+            }
+        }
+
+        /**
+         * Initialize background layers for smooth transitions
+         */
+        function initBackgrounds() {
+            // Create two background layers for crossfade effect
+            const bgLayer1 = document.createElement('div');
+            bgLayer1.className = 'background-layer active';
+            bgLayer1.id = 'bg-layer-1';
+            bgLayer1.style.backgroundImage = `url('img/bg01.png')`;
+            
+            const bgLayer2 = document.createElement('div');
+            bgLayer2.className = 'background-layer inactive';
+            bgLayer2.id = 'bg-layer-2';
+            bgLayer2.style.backgroundImage = `url('img/bg01.png')`;
+            
+            // Insert at the beginning of body
+            document.body.insertBefore(bgLayer2, document.body.firstChild);
+            document.body.insertBefore(bgLayer1, document.body.firstChild);
+            
+            console.log('🖼️ Background system initialized with bg01.png');
+        }
+
+        /**
+         * Update background based on current word count
+         */
+        function updateBackground() {
+            // Calculate which background we should show (1-9)
+            // bg01 = 0-99 words, bg02 = 100-199 words, etc.
+            const newBgIndex = Math.min(MAX_BACKGROUNDS, Math.floor(currentWordCount / WORDS_PER_BACKGROUND) + 1);
+            
+            // If background needs to change
+            if (newBgIndex !== currentBackgroundIndex) {
+                currentBackgroundIndex = newBgIndex;
+                
+                const layer1 = document.getElementById('bg-layer-1');
+                const layer2 = document.getElementById('bg-layer-2');
+                
+                if (!layer1 || !layer2) return;
+                
+                const newBgUrl = `url('img/bg0${currentBackgroundIndex}.png')`;
+                
+                // Determine which layer is currently active
+                const isLayer1Active = layer1.classList.contains('active');
+                const activeLayer = isLayer1Active ? layer1 : layer2;
+                const inactiveLayer = isLayer1Active ? layer2 : layer1;
+                
+                // Set new image on inactive layer
+                inactiveLayer.style.backgroundImage = newBgUrl;
+                
+                // Crossfade: make inactive active and vice versa
+                inactiveLayer.classList.remove('inactive');
+                inactiveLayer.classList.add('active');
+                activeLayer.classList.remove('active');
+                activeLayer.classList.add('inactive');
+                
+                console.log(`🖼️ Background changed to bg0${currentBackgroundIndex}.png (${currentWordCount} words)`);
+            }
+        }
+
+        /**
+         * Update the session stats bars heights
+         */
+        function updateSessionStatsBars() {
+            const previousBar = document.getElementById('previous-session-bar');
+            const currentBar = document.getElementById('current-session-bar');
+            
+            if (!previousBar || !currentBar) return;
+            
+            // Calculate current session words (words written in this session)
+            const currentSessionWords = Math.max(0, currentWordCount - sessionStartWords);
+            
+            // Calculate bar heights (15px per 100 words, max 140px)
+            const previousHeight = Math.min(MAX_BAR_HEIGHT, Math.max(4, (previousSessionWords / 100) * PIXELS_PER_100_WORDS));
+            const currentHeight = Math.min(MAX_BAR_HEIGHT, Math.max(4, (currentSessionWords / 100) * PIXELS_PER_100_WORDS));
+            
+            // Apply heights
+            previousBar.style.height = `${previousHeight}px`;
+            currentBar.style.height = `${currentHeight}px`;
+            
+            // Update tooltips
+            previousBar.title = `Session précédente: ${previousSessionWords} mots`;
+            currentBar.title = `Session actuelle: ${currentSessionWords} mots`;
+        }
+
+        /**
+         * Initialize editor event listeners
+         */
+        function initEditor() {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor) return;
+            
+            editor.addEventListener('keydown', handleKeydown);
+            document.addEventListener('selectionchange', updateToolbarState);
+            editor.addEventListener('keyup', updateBlurViewport);
+            editor.addEventListener('click', updateBlurViewport);
+            editor.addEventListener('focus', updateBlurViewport);
+            editor.addEventListener('scroll', updateBlurViewport);
+            
+            // Handle paste
+            editor.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const text = e.clipboardData.getData('text/plain');
+                document.execCommand('insertText', false, text);
+            });
+            
+            setTimeout(updateBlurViewport, 100);
+        }
+
+        /**
+         * Handle keydown events
+         */
+        function handleKeydown(e) {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor || document.activeElement !== editor) return;
+            
+            // Backspace limitation (only for non-whitespace characters)
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                // Check what character is about to be deleted
+                const charToDelete = getCharacterBeforeCursor();
+                const isWhitespace = charToDelete === '' || /^\s$/.test(charToDelete);
+                
+                // Only apply cooldown for non-whitespace characters
+                if (!isWhitespace) {
+                    const now = Date.now();
+                    const timeSinceLastBackspace = now - lastBackspaceTime;
+                    
+                    if (timeSinceLastBackspace < BACKSPACE_COOLDOWN) {
+                        e.preventDefault();
+                        const remaining = Math.ceil((BACKSPACE_COOLDOWN - timeSinceLastBackspace) / 1000);
+                        showBackspaceBlocked(remaining);
+                        editor.classList.add('typewriter-shake');
+                        setTimeout(() => editor.classList.remove('typewriter-shake'), 200);
+                        return;
+                    }
+                    
+                    lastBackspaceTime = now;
+                    updateBackspaceStatus();
+                }
+                return;
+            }
+            
+            // TAB key - insert 8 spaces for indentation
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                document.execCommand('insertText', false, '        '); // 8 spaces
+                playSound('type');
+                return;
+            }
+            
+            // Keyboard shortcuts
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key.toLowerCase()) {
+                    case 'b':
+                        e.preventDefault();
+                        formatText('bold');
+                        return;
+                    case 'i':
+                        e.preventDefault();
+                        formatText('italic');
+                        return;
+                    case 'u':
+                        e.preventDefault();
+                        formatText('underline');
+                        return;
+                    case 's':
+                        e.preventDefault();
+                        saveFile();
+                        return;
+                }
+            }
+            
+            // Play sounds
+            if (e.key === 'Enter') {
+                playSound('enter');
+                setTimeout(updateBlurViewport, 10);
+            } else if (e.key === ' ') {
+                playSound('space');
+                // Check word count after space (word completed)
+                setTimeout(checkWordCount, 10);
+            } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                playSound('type');
+            }
+            
+            // Navigation keys
+            if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown'].includes(e.key)) {
+                setTimeout(updateBlurViewport, 10);
+            }
+        }
+
+        /**
+         * Show backspace blocked message
+         */
+        function showBackspaceBlocked(seconds) {
+            const status = document.getElementById('typewriter-backspace-status');
+            if (status) {
+                status.textContent = `⏳ Retour arrière bloqué (${seconds}s)`;
+                status.classList.add('typewriter-status-warning');
+                setTimeout(() => {
+                    status.classList.remove('typewriter-status-warning');
+                    updateBackspaceStatus();
+                }, 1000);
+            }
+        }
+
+        /**
+         * Update backspace status
+         */
+        function updateBackspaceStatus() {
+            const status = document.getElementById('typewriter-backspace-status');
+            if (!status) return;
+            
+            const now = Date.now();
+            const timeSince = now - lastBackspaceTime;
+            
+            if (timeSince < BACKSPACE_COOLDOWN) {
+                const remaining = Math.ceil((BACKSPACE_COOLDOWN - timeSince) / 1000);
+                status.textContent = `⏳ Prochain retour: ${remaining}s`;
+            } else {
+                status.textContent = '✓ Retour arrière disponible';
+            }
+        }
+
+        /**
+         * Update blur viewport based on cursor position
+         */
+        function updateBlurViewport() {
+            const editor = document.getElementById('typewriter-editor');
+            const viewport = document.getElementById('typewriter-viewport');
+            const blurTop = document.querySelector('.typewriter-blur-top');
+            const blurBottom = document.querySelector('.typewriter-blur-bottom');
+            const clearZone = document.querySelector('.typewriter-clear-zone');
+            
+            if (!editor || !viewport || !blurTop || !blurBottom || !clearZone) return;
+            
+            const caretY = getCaretYPosition(editor);
+            const scrollTop = editor.scrollTop;
+            const caretRelative = caretY - scrollTop;
+            const visibleZoneHeight = VISIBLE_LINES_EACH_SIDE * 2 * LINE_HEIGHT;
+            
+            const clearZoneTop = caretRelative - (VISIBLE_LINES_EACH_SIDE * LINE_HEIGHT);
+            const clearZoneBottom = caretRelative + (VISIBLE_LINES_EACH_SIDE * LINE_HEIGHT);
+            
+            const viewportHeight = viewport.clientHeight;
+            const topBlurHeight = Math.max(0, clearZoneTop);
+            const bottomBlurTop = Math.min(viewportHeight, clearZoneBottom);
+            const bottomBlurHeight = Math.max(0, viewportHeight - bottomBlurTop);
+            
+            blurTop.style.height = `${topBlurHeight}px`;
+            clearZone.style.height = `${visibleZoneHeight}px`;
+            clearZone.style.top = `${topBlurHeight}px`;
+            blurBottom.style.height = `${bottomBlurHeight}px`;
+            blurBottom.style.top = `${bottomBlurTop}px`;
+        }
+
+        /**
+         * Get caret Y position
+         */
+        function getCaretYPosition(editor) {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return LINE_HEIGHT;
+            
+            const range = selection.getRangeAt(0).cloneRange();
+            range.collapse(true);
+            
+            const marker = document.createElement('span');
+            marker.textContent = '\u200B';
+            
+            try {
+                range.insertNode(marker);
+                const markerRect = marker.getBoundingClientRect();
+                const editorRect = editor.getBoundingClientRect();
+                const caretY = (markerRect.top - editorRect.top) + editor.scrollTop + (LINE_HEIGHT / 2);
+                marker.parentNode.removeChild(marker);
+                return caretY;
+            } catch (e) {
+                if (marker.parentNode) marker.parentNode.removeChild(marker);
+                return LINE_HEIGHT;
+            }
+        }
+
+        /**
+         * Format text
+         */
+        function formatText(command) {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor) return;
+            editor.focus();
+            document.execCommand(command, false, null);
+            updateToolbarState();
+        }
+
+        /**
+         * Update toolbar button states
+         */
+        function updateToolbarState() {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor || document.activeElement !== editor) return;
+            
+            const boldBtn = document.getElementById('tw-bold');
+            const italicBtn = document.getElementById('tw-italic');
+            const underlineBtn = document.getElementById('tw-underline');
+            
+            if (boldBtn) boldBtn.classList.toggle('active', document.queryCommandState('bold'));
+            if (italicBtn) italicBtn.classList.toggle('active', document.queryCommandState('italic'));
+            if (underlineBtn) underlineBtn.classList.toggle('active', document.queryCommandState('underline'));
+        }
+
+        /**
+         * Toggle toolbar visibility
+         */
+        function toggleToolbar() {
+            const toolbar = document.getElementById('typewriter-toolbar');
+            const toggleBar = document.getElementById('typewriter-toggle-bar');
+            const toggleBtn = document.getElementById('toggle-toolbar-btn');
+            
+            toolbarCollapsed = !toolbarCollapsed;
+            
+            if (toolbarCollapsed) {
+                toolbar.classList.add('collapsed');
+                toggleBar.classList.add('show');
+            } else {
+                toolbar.classList.remove('collapsed');
+                toggleBar.classList.remove('show');
+            }
+        }
+
+        /**
+         * Open file
+         */
+        function openFile() {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor) return;
+            
+            const currentContent = editor.innerHTML.trim();
+            if (currentContent && currentContent !== '<br>' && currentContent !== '') {
+                if (!confirm('Le document actuel sera remplacé. Continuer ?')) {
+                    return;
+                }
+            }
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.mae,.json';
+            
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    
+                    if (!data.type || data.type !== 'machine-a-ecrire') {
+                        alert('Format de fichier invalide.');
+                        return;
+                    }
+                    
+                    if (!data.content) {
+                        alert('Le fichier ne contient pas de contenu.');
+                        return;
+                    }
+                    
+                    editor.innerHTML = data.content;
+                    
+                    if (data.title) {
+                        documentName = data.title;
+                        const titleEl = document.getElementById('typewriter-title');
+                        if (titleEl) titleEl.textContent = `⌨️ ${documentName}`;
+                        document.title = documentName + ' - Machine à écrire';
+                    }
+                    
+                    // Load previous session data
+                    if (data.previousSession && typeof data.previousSession.words === 'number') {
+                        previousSessionWords = data.previousSession.words;
+                        console.log(`📊 Loaded previous session: ${previousSessionWords} words`);
+                    } else {
+                        previousSessionWords = 0;
+                    }
+                    
+                    // Reset current session tracking
+                    currentWordCount = getWordCount();
+                    sessionStartWords = currentWordCount;
+                    lastWordMilestone = Math.floor(currentWordCount / encouragementThreshold);
+                    
+                    lastBackspaceTime = 0;
+                    updateBackspaceStatus();
+                    setTimeout(() => {
+                        updateBlurViewport();
+                        updateSessionStatsBars();
+                        moveCursorToEnd(); // Place cursor at the end
+                    }, 100);
+                    
+                } catch (error) {
+                    console.error('Import error:', error);
+                    alert('Erreur lors de l\'import.');
+                }
+            };
+            
+            input.click();
+        }
+
+        /**
+         * Save file
+         */
+        function saveFile() {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor) return;
+            
+            const content = editor.innerHTML;
+            if (!content.trim() || content === '<br>') {
+                alert('Le document est vide.');
+                return;
+            }
+            
+            // Calculate current session words for saving
+            const currentSessionWords = Math.max(0, currentWordCount - sessionStartWords);
+            
+            const exportData = {
+                version: '1.0',
+                type: 'machine-a-ecrire',
+                title: documentName,
+                createdAt: new Date().toISOString(),
+                modifiedAt: new Date().toISOString(),
+                content: content,
+                plainText: editor.innerText || editor.textContent,
+                previousSession: {
+                    words: currentSessionWords,
+                    savedAt: new Date().toISOString()
+                }
+            };
+            
+            const jsonString = JSON.stringify(exportData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const safeFileName = documentName
+                .toLowerCase()
+                .replace(/[^a-z0-9àâäéèêëïîôùûüç\s-]/gi, '')
+                .replace(/\s+/g, '-')
+                .substring(0, 50) || 'document';
+            
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${safeFileName}-${dateStr}.mae`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            console.log(`💾 Saved with session stats: ${currentSessionWords} words this session`);
+        }
+
+        /**
+         * Export to PDF
+         */
+        async function exportPDF() {
+            const editor = document.getElementById('typewriter-editor');
+            if (!editor) return;
+            
+            const content = editor.innerHTML;
+            if (!content.trim()) {
+                alert('Le document est vide.');
+                return;
+            }
+            
+            // Load jsPDF if needed
+            if (typeof jspdf === 'undefined' && typeof jsPDF === 'undefined') {
+                await loadJsPDF();
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf || { jsPDF: window.jsPDF };
+                if (!jsPDF) {
+                    alert('Erreur: Impossible de charger la bibliothèque PDF.');
+                    return;
+                }
+                
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const pageWidth = 210;
+                const pageHeight = 297;
+                const margin = 20;
+                const usableWidth = pageWidth - (margin * 2);
+                const lineHeight = 5.5;
+                const paragraphSpacing = 3;
+                let currentY = margin;
+                
+                doc.setFontSize(11);
+                
+                const segments = parseHTMLForPDF(editor);
+                
+                for (const segment of segments) {
+                    if (segment.type === 'paragraph-break') {
+                        currentY += paragraphSpacing;
+                        continue;
+                    }
+                    if (segment.type === 'line-break') {
+                        currentY += lineHeight;
+                        continue;
+                    }
+                    
+                    if (currentY + lineHeight > pageHeight - margin) {
+                        doc.addPage();
+                        currentY = margin;
+                    }
+                    
+                    let fontStyle = 'normal';
+                    if (segment.bold && segment.italic) fontStyle = 'bolditalic';
+                    else if (segment.bold) fontStyle = 'bold';
+                    else if (segment.italic) fontStyle = 'italic';
+                    doc.setFont('courier', fontStyle);
+                    
+                    const wrappedLines = wrapTextForPDF(segment.text, usableWidth, doc);
+                    
+                    for (const line of wrappedLines) {
+                        if (currentY + lineHeight > pageHeight - margin) {
+                            doc.addPage();
+                            currentY = margin;
+                        }
+                        doc.text(line, margin, currentY);
+                        if (segment.underline && line.trim()) {
+                            const textWidth = doc.getTextWidth(line);
+                            doc.setLineWidth(0.3);
+                            doc.line(margin, currentY + 1, margin + textWidth, currentY + 1);
+                        }
+                        currentY += lineHeight;
+                    }
+                }
+                
+                doc.save(`${documentName}.pdf`);
+            } catch (error) {
+                console.error('PDF export error:', error);
+                alert('Erreur lors de l\'export PDF.');
+            }
+        }
+
+        /**
+         * Load jsPDF library
+         */
+        function loadJsPDF() {
+            return new Promise((resolve, reject) => {
+                if (window.jspdf || window.jsPDF) {
+                    resolve();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+
+        /**
+         * Parse HTML for PDF export
+         */
+        function parseHTMLForPDF(editor) {
+            const segments = [];
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = editor.innerHTML;
+            
+            function walkNodes(node, formatting = { bold: false, italic: false, underline: false }) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    if (text) {
+                        segments.push({ type: 'text', text, ...formatting });
+                    }
+                    return;
+                }
+                if (node.nodeType !== Node.ELEMENT_NODE) return;
+                
+                const tagName = node.tagName.toLowerCase();
+                
+                if (['div', 'p', 'br'].includes(tagName)) {
+                    if (tagName === 'br') segments.push({ type: 'line-break' });
+                    else if (tagName === 'p') segments.push({ type: 'paragraph-break' });
+                    else if (tagName === 'div' && segments.length > 0) {
+                        const last = segments[segments.length - 1];
+                        if (last.type !== 'line-break' && last.type !== 'paragraph-break') {
+                            segments.push({ type: 'line-break' });
+                        }
+                    }
+                }
+                
+                const newFormatting = { ...formatting };
+                if (['b', 'strong'].includes(tagName)) newFormatting.bold = true;
+                if (['i', 'em'].includes(tagName)) newFormatting.italic = true;
+                if (tagName === 'u') newFormatting.underline = true;
+                
+                for (const child of node.childNodes) {
+                    walkNodes(child, newFormatting);
+                }
+                
+                if (['div', 'p'].includes(tagName) && node.childNodes.length > 0) {
+                    const last = segments[segments.length - 1];
+                    if (last && last.type !== 'line-break' && last.type !== 'paragraph-break') {
+                        segments.push({ type: 'line-break' });
+                    }
+                }
+            }
+            
+            walkNodes(tempDiv);
+            return segments;
+        }
+
+        /**
+         * Wrap text for PDF
+         */
+        function wrapTextForPDF(text, maxWidth, doc) {
+            if (!text || !text.trim()) return [''];
+            
+            const lines = [];
+            const words = text.split(/\s+/);
+            let currentLine = '';
+            
+            for (const word of words) {
+                const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                if (doc.getTextWidth(testLine) > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines.length > 0 ? lines : [''];
+        }
+
+        /**
+         * Open sound options modal
+         */
+        function openSoundOptions() {
+            const modal = document.getElementById('sound-modal');
+            if (modal) modal.classList.add('show');
+            
+            // Set current selections
+            const typeRadio = document.querySelector(`input[name="sound-type"][value="${soundPreferences.type}"]`);
+            const enterRadio = document.querySelector(`input[name="sound-enter"][value="${soundPreferences.enter}"]`);
+            const spaceRadio = document.querySelector(`input[name="sound-space"][value="${soundPreferences.space}"]`);
+            
+            if (typeRadio) typeRadio.checked = true;
+            if (enterRadio) enterRadio.checked = true;
+            if (spaceRadio) spaceRadio.checked = true;
+            
+            // Set encouragement slider to current value
+            const slider = document.getElementById('encouragement-slider');
+            if (slider) {
+                slider.value = encouragementThreshold / 100;
+                updateSliderValue();
+            }
+        }
+
+        /**
+         * Close sound options modal
+         */
+        function closeSoundOptions() {
+            const modal = document.getElementById('sound-modal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        /**
+         * Preview a sound
+         */
+        function previewSound(file) {
+            const audio = new Audio(file);
+            audio.volume = 0.5;
+            audio.play().catch(() => {});
+        }
+
+        /**
+         * Accept sound options
+         */
+        function acceptSoundOptions() {
+            const typeSound = document.querySelector('input[name="sound-type"]:checked');
+            const enterSound = document.querySelector('input[name="sound-enter"]:checked');
+            const spaceSound = document.querySelector('input[name="sound-space"]:checked');
+            
+            if (typeSound) soundPreferences.type = typeSound.value;
+            if (enterSound) soundPreferences.enter = enterSound.value;
+            if (spaceSound) soundPreferences.space = spaceSound.value;
+            
+            // Save encouragement threshold
+            const slider = document.getElementById('encouragement-slider');
+            if (slider) {
+                encouragementThreshold = parseInt(slider.value) * 100;
+                console.log(`🏆 Encouragement threshold set to ${encouragementThreshold} words`);
+            }
+            
+            loadSounds();
+            closeSoundOptions();
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

@@ -1342,7 +1342,9 @@
         
         .typewriter-intro-footer {
             margin-top: 20px;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
             padding-top: 15px;
             border-top: 1px solid #d0d0d0;
         }
@@ -1393,12 +1395,6 @@
         .typewriter-intro-name input:focus {
             outline: none;
             background: #fffff8;
-        }
-        
-        /* Import button section in intro */
-        .typewriter-intro-import {
-            margin-top: 12px;
-            text-align: center;
         }
         
         .typewriter-intro-btn-secondary {
