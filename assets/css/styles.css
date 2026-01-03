@@ -460,6 +460,21 @@
             object-fit: contain;
         }
 
+        /* Shortcut icon wrapper for arrow overlay */
+        .icon-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .shortcut-arrow {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 12px;
+            height: 12px;
+            pointer-events: none;
+        }
+
         .icon-label {
             color: white;
             text-align: center;

@@ -325,11 +325,70 @@
             animation: typewriter-shake 0.2s ease-in-out;
         }
 
+        /* Window shake animation (more intense) */
+        @keyframes window-shake {
+            0%, 100% { transform: translate(-50%, -50%); }
+            10% { transform: translate(-50%, -50%) translateX(-8px) rotate(-1deg); }
+            20% { transform: translate(-50%, -50%) translateX(8px) rotate(1deg); }
+            30% { transform: translate(-50%, -50%) translateX(-6px) rotate(-0.5deg); }
+            40% { transform: translate(-50%, -50%) translateX(6px) rotate(0.5deg); }
+            50% { transform: translate(-50%, -50%) translateX(-4px); }
+            60% { transform: translate(-50%, -50%) translateX(4px); }
+            70% { transform: translate(-50%, -50%) translateX(-2px); }
+            80% { transform: translate(-50%, -50%) translateX(2px); }
+            90% { transform: translate(-50%, -50%) translateX(-1px); }
+        }
+
+        .typewriter-fullscreen-container.window-shake {
+            animation: window-shake 0.6s ease-in-out;
+        }
+
+        /* Error popup */
+        .error-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(to bottom, #f8f8f8 0%, #e8e8e8 100%);
+            border: 2px outset #c0c0c0;
+            padding: 20px 30px;
+            z-index: 10000;
+            text-align: center;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            font-size: 13px;
+            color: #000;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+            max-width: 350px;
+            opacity: 0;
+            animation: popup-appear 0.3s ease forwards;
+        }
+
+        @keyframes popup-appear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .error-popup-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .error-popup-message {
+            line-height: 1.5;
+            font-style: italic;
+        }
+
         /* ===== STATUS BAR ===== */
         .typewriter-status {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
             padding: 2px 8px;
             background: #c0c0c0;
             border-top: 1px solid #808080;
@@ -342,6 +401,24 @@
         .typewriter-status-warning {
             color: #cc0000;
             font-weight: bold;
+        }
+
+        /* Caps Lock indicator */
+        .capslock-indicator {
+            color: #cc0000;
+            font-weight: bold;
+            font-size: 11px;
+            display: none;
+            animation: capslock-flash 0.8s ease-in-out infinite;
+        }
+
+        .capslock-indicator.active {
+            display: inline;
+        }
+
+        @keyframes capslock-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
 
         /* ===== SOUND OPTIONS MODAL ===== */
@@ -360,6 +437,141 @@
 
         .modal-overlay.show {
             display: flex;
+        }
+
+        /* ===== COLOR OPTIONS MODAL ===== */
+        .color-options-modal {
+            width: 380px;
+            max-width: 90vw;
+            background: #c0c0c0;
+            border: 2px outset #dfdfdf;
+            box-shadow: 
+                inset 1px 1px 0 #ffffff,
+                inset -1px -1px 0 #808080,
+                4px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-section {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f0f0e8;
+            border: 1px solid #d0d0c8;
+        }
+
+        .color-section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #000;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .color-picker-input {
+            width: 60px;
+            height: 40px;
+            border: 2px inset #808080;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .color-picker-input::-webkit-color-swatch-wrapper {
+            padding: 2px;
+        }
+
+        .color-picker-input::-webkit-color-swatch {
+            border: 1px solid #808080;
+        }
+
+        .color-hex-display {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .color-sample-zone {
+            margin: 16px 0;
+            padding: 20px;
+            border: 2px inset #808080;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 80px;
+            text-align: center;
+        }
+
+        .color-buttons-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .color-btn {
+            padding: 6px 16px;
+            font-size: 12px;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 2px outset #c0c0c0;
+            cursor: pointer;
+        }
+
+        .color-btn:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+        }
+
+        .color-btn:active {
+            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
+            border: 2px inset #c0c0c0;
+        }
+
+        .color-btn-primary {
+            background: linear-gradient(to bottom, #000080 0%, #0000cc 100%);
+            color: white;
+            border-color: #000066;
+        }
+
+        .color-btn-primary:hover {
+            background: linear-gradient(to bottom, #0000aa 0%, #0000ff 100%);
+        }
+
+        .blur-color-options {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .blur-color-option {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .blur-color-option input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .blur-color-swatch {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #808080;
+            display: inline-block;
+        }
+
+        .blur-color-swatch.white {
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .blur-color-swatch.dark {
+            background: rgba(30, 30, 50, 0.7);
+        }
+
+        .blur-color-swatch.adaptive {
+            background: linear-gradient(135deg, #fffef0 50%, #1a1a2e 50%);
         }
 
         .sound-options-modal {
@@ -784,6 +996,9 @@
             <button class="typewriter-btn typewriter-btn-action" onclick="openSoundOptions()" title="Options sonores">
                 <img src="img/soundoptions.png" alt="Sons">
             </button>
+            <button class="typewriter-btn typewriter-btn-action" onclick="openColorOptions()" title="Couleurs">
+                🎨
+            </button>
             <button class="typewriter-toggle-btn" id="toggle-toolbar-btn" onclick="toggleToolbar()" title="Réduire le menu">
                 ▲
             </button>
@@ -844,6 +1059,7 @@
                     <h4>🎧 Sons</h4>
                     <p>Typewriter Key Press 04 by BryanSaraiva — <a href="https://freesound.org/s/820351/" target="_blank">freesound.org/s/820351</a> — License: Attribution 4.0</p>
                     <p>Toy Electronic Typewriter Spacebar Press by sprinkleCipher — <a href="https://freesound.org/s/752754/" target="_blank">freesound.org/s/752754</a> — License: CC0</p>
+                    <p>Toy Electronic Typewriter Return Lever by sprinkleCipher — <a href="https://freesound.org/s/752753/" target="_blank">freesound.org/s/752753</a> — License: CC0</p>
                     <p>Typewriter BELL.wav by mincedbeats — <a href="https://freesound.org/s/433596/" target="_blank">freesound.org/s/433596</a> — License: CC0</p>
                     <p>Typewriter.wav by ddohler — <a href="https://freesound.org/s/9098/" target="_blank">freesound.org/s/9098</a> — License: Attribution 4.0</p>
                     <p>typewriter.wav by Horn — <a href="https://freesound.org/s/9744/" target="_blank">freesound.org/s/9744</a> — License: Attribution NC 3.0</p>
@@ -859,6 +1075,7 @@
 
         <!-- Status Bar -->
         <div class="typewriter-status">
+            <span class="capslock-indicator" id="capslock-indicator">⚠️ La touche Verr. Maj. est enclenchée.</span>
             <span id="typewriter-backspace-status">✓ Retour arrière disponible</span>
         </div>
     </div>
@@ -909,7 +1126,17 @@
                 <div class="sound-category">
                     <div class="sound-category-title">Bouton "Espace"</div>
                     <label class="sound-option">
-                        <input type="radio" name="sound-space" value="sounds/spacebarkey.mp3" checked>
+                        <input type="radio" name="sound-space" value="sounds/spacebarkey3.wav" checked>
+                        <span class="sound-label">spacebarkey3.wav</span>
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/spacebarkey3.wav')">▶</button>
+                    </label>
+                    <label class="sound-option">
+                        <input type="radio" name="sound-space" value="sounds/spacebarkey2.mp3">
+                        <span class="sound-label">spacebarkey2.mp3</span>
+                        <button class="sound-preview-btn" onclick="previewSound('sounds/spacebarkey2.mp3')">▶</button>
+                    </label>
+                    <label class="sound-option">
+                        <input type="radio" name="sound-space" value="sounds/spacebarkey.mp3">
                         <span class="sound-label">spacebarkey.mp3</span>
                         <button class="sound-preview-btn" onclick="previewSound('sounds/spacebarkey.mp3')">▶</button>
                     </label>
@@ -936,6 +1163,66 @@
         </div>
     </div>
 
+    <!-- Color Options Modal -->
+    <div class="modal-overlay" id="color-modal">
+        <div class="color-options-modal">
+            <div class="modal-titlebar">
+                <span>🎨 Personnalisation des couleurs</span>
+                <button class="modal-close-btn" onclick="closeColorOptions()">×</button>
+            </div>
+            <div class="modal-content">
+                <div class="color-section">
+                    <div class="color-section-title">Couleur de fond</div>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="color-bg-picker" class="color-picker-input" value="#fffef0" oninput="updateColorPreview()">
+                        <span class="color-hex-display" id="color-bg-hex">#fffef0</span>
+                    </div>
+                </div>
+                
+                <div class="color-section">
+                    <div class="color-section-title">Couleur de la police</div>
+                    <div class="color-picker-wrapper">
+                        <input type="color" id="color-text-picker" class="color-picker-input" value="#1a1a2e" oninput="updateColorPreview()">
+                        <span class="color-hex-display" id="color-text-hex">#1a1a2e</span>
+                    </div>
+                </div>
+
+                <div class="color-section">
+                    <div class="color-section-title">Couleur de l'effet focus</div>
+                    <div class="blur-color-options">
+                        <label class="blur-color-option">
+                            <input type="radio" name="blur-color" value="white" checked>
+                            <span class="blur-color-swatch white"></span>
+                            <span>Blanc</span>
+                        </label>
+                        <label class="blur-color-option">
+                            <input type="radio" name="blur-color" value="dark">
+                            <span class="blur-color-swatch dark"></span>
+                            <span>Sombre</span>
+                        </label>
+                        <label class="blur-color-option">
+                            <input type="radio" name="blur-color" value="adaptive">
+                            <span class="blur-color-swatch adaptive"></span>
+                            <span>Adaptatif</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="color-section">
+                    <div class="color-section-title">Aperçu</div>
+                    <div class="color-sample-zone" id="color-sample-zone">
+                        Votre texte ressemblera à ceci
+                    </div>
+                </div>
+                
+                <div class="color-buttons-row">
+                    <button class="color-btn" onclick="resetColorOptions()">Réinitialiser aux valeurs par défaut</button>
+                    <button class="color-btn color-btn-primary" onclick="applyColorOptions()">Valider les changements</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ========================================================================
         // MACHINE À ÉCRIRE - Fullscreen Version
@@ -952,7 +1239,7 @@
         let soundPreferences = {
             type: 'sounds/typekey_1A.wav',
             enter: 'sounds/enterkey.wav',
-            space: 'sounds/spacebarkey.mp3'
+            space: 'sounds/spacebarkey3.wav'
         };
 
         // Backspace cooldown
@@ -971,6 +1258,9 @@
 
         // Encouragement system
         let encouragementSound = null;
+        let errorSound = null;
+        let windchimeSound = null;
+        let saveSound = null;
         let encouragementThreshold = 300; // Default: 300 words
         let lastWordMilestone = 0; // Track the last milestone reached
         let currentWordCount = 0;
@@ -1052,6 +1342,41 @@
                         }
                     }
                     
+                    // Load sound preferences if available
+                    if (data.preferences && data.preferences.sounds) {
+                        const soundPrefs = data.preferences.sounds;
+                        if (soundPrefs.type) soundPreferences.type = soundPrefs.type;
+                        if (soundPrefs.enter) soundPreferences.enter = soundPrefs.enter;
+                        if (soundPrefs.space) soundPreferences.space = soundPrefs.space;
+                        if (soundPrefs.encouragementThreshold) {
+                            encouragementThreshold = soundPrefs.encouragementThreshold;
+                        }
+                        console.log(`🔊 Sound preferences loaded`);
+                    }
+                    
+                    // Load color preferences if available
+                    if (data.preferences && data.preferences.colors) {
+                        const colorPrefs = data.preferences.colors;
+                        if (colorPrefs.background) currentColors.background = colorPrefs.background;
+                        if (colorPrefs.text) currentColors.text = colorPrefs.text;
+                        if (colorPrefs.blur) currentColors.blur = colorPrefs.blur;
+                        
+                        // Apply colors immediately
+                        setTimeout(() => {
+                            const editor = document.getElementById('typewriter-editor');
+                            const content = document.querySelector('.typewriter-content');
+                            if (editor) {
+                                editor.style.backgroundColor = currentColors.background;
+                                editor.style.color = currentColors.text;
+                            }
+                            if (content) {
+                                content.style.backgroundColor = currentColors.background;
+                            }
+                            applyBlurColor(currentColors.blur, currentColors.background);
+                            console.log(`🎨 Color preferences loaded`);
+                        }, 50);
+                    }
+                    
                     // Clear sessionStorage after loading
                     sessionStorage.removeItem('typewriter-data');
                 } catch (e) {
@@ -1091,6 +1416,21 @@
                 encouragementSound = new Audio('sounds/levelup_01.mp3');
                 encouragementSound.preload = 'auto';
                 encouragementSound.volume = 0.7;
+
+                // Load error sound
+                errorSound = new Audio('sounds/error.mp3');
+                errorSound.preload = 'auto';
+                errorSound.volume = 0.6;
+
+                // Load windchime sound for background transitions
+                windchimeSound = new Audio('sounds/windchime.wav');
+                windchimeSound.preload = 'auto';
+                windchimeSound.volume = 0.5;
+
+                // Load save sound
+                saveSound = new Audio('sounds/sauvegarder.wav');
+                saveSound.preload = 'auto';
+                saveSound.volume = 0.6;
                 
                 console.log('⌨️ Sounds loaded');
             } catch (error) {
@@ -1153,6 +1493,58 @@
                 encouragementSound.currentTime = 0;
                 encouragementSound.play().catch(() => {});
             }
+        }
+
+        /**
+         * Play the error sound
+         */
+        function playErrorSound() {
+            if (errorSound) {
+                errorSound.currentTime = 0;
+                errorSound.play().catch(() => {});
+            }
+        }
+
+        /**
+         * Shake the window
+         */
+        function shakeWindow() {
+            const container = document.querySelector('.typewriter-fullscreen-container');
+            if (container) {
+                container.classList.add('window-shake');
+                setTimeout(() => container.classList.remove('window-shake'), 600);
+            }
+        }
+
+        /**
+         * Show error popup with message
+         */
+        function showErrorPopup(message) {
+            // Remove any existing popup
+            const existingPopup = document.querySelector('.error-popup');
+            if (existingPopup) {
+                existingPopup.remove();
+            }
+            
+            // Create popup
+            const popup = document.createElement('div');
+            popup.className = 'error-popup';
+            popup.innerHTML = `
+                <div class="error-popup-icon">⚠️</div>
+                <div class="error-popup-message">${message}</div>
+            `;
+            
+            document.body.appendChild(popup);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.style.opacity = '0';
+                    popup.style.transform = 'translate(-50%, -50%) scale(0.8)';
+                    popup.style.transition = 'all 0.3s ease';
+                    setTimeout(() => popup.remove(), 300);
+                }
+            }, 3000);
         }
 
         /**
@@ -1339,6 +1731,12 @@
                 activeLayer.classList.remove('active');
                 activeLayer.classList.add('inactive');
                 
+                // Play windchime sound on background change
+                if (windchimeSound) {
+                    windchimeSound.currentTime = 0;
+                    windchimeSound.play().catch(() => {});
+                }
+                
                 console.log(`🖼️ Background changed to bg0${currentBackgroundIndex}.png (${currentWordCount} words)`);
             }
         }
@@ -1376,20 +1774,38 @@
             if (!editor) return;
             
             editor.addEventListener('keydown', handleKeydown);
+            editor.addEventListener('keydown', checkCapsLock);
+            editor.addEventListener('keyup', checkCapsLock);
             document.addEventListener('selectionchange', updateToolbarState);
             editor.addEventListener('keyup', updateBlurViewport);
             editor.addEventListener('click', updateBlurViewport);
             editor.addEventListener('focus', updateBlurViewport);
             editor.addEventListener('scroll', updateBlurViewport);
             
-            // Handle paste
+            // Handle paste - BLOCKED
             editor.addEventListener('paste', function(e) {
                 e.preventDefault();
-                const text = e.clipboardData.getData('text/plain');
-                document.execCommand('insertText', false, text);
+                playErrorSound();
+                showErrorPopup("Ce sont tes mots à toi qui comptent, pas ceux des autres.");
             });
             
             setTimeout(updateBlurViewport, 100);
+        }
+
+        /**
+         * Check Caps Lock state and update indicator
+         */
+        function checkCapsLock(e) {
+            const indicator = document.getElementById('capslock-indicator');
+            if (!indicator) return;
+            
+            const isCapsLockOn = e.getModifierState && e.getModifierState('CapsLock');
+            
+            if (isCapsLockOn) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
         }
 
         /**
@@ -1398,6 +1814,25 @@
         function handleKeydown(e) {
             const editor = document.getElementById('typewriter-editor');
             if (!editor || document.activeElement !== editor) return;
+            
+            // Check for selection deletion attempts (more than one word selected)
+            const selection = window.getSelection();
+            if (selection && !selection.isCollapsed) {
+                const selectedText = selection.toString().trim();
+                const wordCount = selectedText.split(/\s+/).filter(w => w.length > 0).length;
+                
+                // If more than one word is selected
+                if (wordCount > 1) {
+                    // Block Backspace, Delete, or Ctrl+X on selection
+                    if (e.key === 'Backspace' || e.key === 'Delete' || (e.ctrlKey && e.key.toLowerCase() === 'x')) {
+                        e.preventDefault();
+                        playErrorSound();
+                        shakeWindow();
+                        showErrorPopup("La vraie erreur c'est de ne pas continuer à écrire.");
+                        return;
+                    }
+                }
+            }
             
             // Backspace limitation (only for non-whitespace characters)
             if (e.key === 'Backspace' || e.key === 'Delete') {
@@ -1702,7 +2137,7 @@
             const currentSessionWords = Math.max(0, currentWordCount - sessionStartWords);
             
             const exportData = {
-                version: '1.0',
+                version: '1.1',
                 type: 'machine-a-ecrire',
                 title: documentName,
                 createdAt: new Date().toISOString(),
@@ -1712,6 +2147,19 @@
                 previousSession: {
                     words: currentSessionWords,
                     savedAt: new Date().toISOString()
+                },
+                preferences: {
+                    sounds: {
+                        type: soundPreferences.type,
+                        enter: soundPreferences.enter,
+                        space: soundPreferences.space,
+                        encouragementThreshold: encouragementThreshold
+                    },
+                    colors: {
+                        background: currentColors.background,
+                        text: currentColors.text,
+                        blur: currentColors.blur
+                    }
                 }
             };
             
@@ -1735,6 +2183,12 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            
+            // Play save sound
+            if (saveSound) {
+                saveSound.currentTime = 0;
+                saveSound.play().catch(() => {});
+            }
             
             console.log(`💾 Saved with session stats: ${currentSessionWords} words this session`);
         }
@@ -1897,22 +2351,30 @@
         }
 
         /**
-         * Wrap text for PDF
+         * Wrap text for PDF (preserves leading spaces for indentation)
          */
         function wrapTextForPDF(text, maxWidth, doc) {
-            if (!text || !text.trim()) return [''];
+            if (!text) return [''];
+            if (!text.trim()) return [text]; // Preserve whitespace-only lines
+            
+            // Preserve leading spaces (indentation)
+            const leadingSpaces = text.match(/^\s*/);
+            const indent = leadingSpaces ? leadingSpaces[0] : '';
+            const trimmedText = text.trimStart();
             
             const lines = [];
-            const words = text.split(/\s+/);
-            let currentLine = '';
+            const words = trimmedText.split(/\s+/);
+            let currentLine = indent; // Start with indentation
+            let isFirstWord = true;
             
             for (const word of words) {
-                const testLine = currentLine + (currentLine ? ' ' : '') + word;
-                if (doc.getTextWidth(testLine) > maxWidth && currentLine) {
+                const testLine = currentLine + (isFirstWord ? '' : ' ') + word;
+                if (doc.getTextWidth(testLine) > maxWidth && !isFirstWord) {
                     lines.push(currentLine);
-                    currentLine = word;
+                    currentLine = word; // No indent for wrapped lines
                 } else {
                     currentLine = testLine;
+                    isFirstWord = false;
                 }
             }
             if (currentLine) lines.push(currentLine);
@@ -1981,6 +2443,149 @@
             
             loadSounds();
             closeSoundOptions();
+        }
+
+        // Color preferences - default values
+        const defaultColors = {
+            background: '#fffef0',
+            text: '#1a1a2e',
+            blur: 'white'
+        };
+        
+        let currentColors = {
+            background: '#fffef0',
+            text: '#1a1a2e',
+            blur: 'white'
+        };
+
+        /**
+         * Open color options modal
+         */
+        function openColorOptions() {
+            const modal = document.getElementById('color-modal');
+            if (modal) modal.classList.add('show');
+            
+            // Set current color values
+            const bgPicker = document.getElementById('color-bg-picker');
+            const textPicker = document.getElementById('color-text-picker');
+            const blurRadio = document.querySelector(`input[name="blur-color"][value="${currentColors.blur}"]`);
+            
+            if (bgPicker) bgPicker.value = currentColors.background;
+            if (textPicker) textPicker.value = currentColors.text;
+            if (blurRadio) blurRadio.checked = true;
+            
+            updateColorPreview();
+        }
+
+        /**
+         * Close color options modal
+         */
+        function closeColorOptions() {
+            const modal = document.getElementById('color-modal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        /**
+         * Update color preview sample zone
+         */
+        function updateColorPreview() {
+            const bgPicker = document.getElementById('color-bg-picker');
+            const textPicker = document.getElementById('color-text-picker');
+            const bgHex = document.getElementById('color-bg-hex');
+            const textHex = document.getElementById('color-text-hex');
+            const sampleZone = document.getElementById('color-sample-zone');
+            
+            if (bgPicker && bgHex) {
+                bgHex.textContent = bgPicker.value.toUpperCase();
+            }
+            if (textPicker && textHex) {
+                textHex.textContent = textPicker.value.toUpperCase();
+            }
+            
+            if (sampleZone && bgPicker && textPicker) {
+                sampleZone.style.backgroundColor = bgPicker.value;
+                sampleZone.style.color = textPicker.value;
+            }
+        }
+
+        /**
+         * Reset colors to default values
+         */
+        function resetColorOptions() {
+            const bgPicker = document.getElementById('color-bg-picker');
+            const textPicker = document.getElementById('color-text-picker');
+            const blurRadio = document.querySelector(`input[name="blur-color"][value="${defaultColors.blur}"]`);
+            
+            if (bgPicker) bgPicker.value = defaultColors.background;
+            if (textPicker) textPicker.value = defaultColors.text;
+            if (blurRadio) blurRadio.checked = true;
+            
+            updateColorPreview();
+        }
+
+        /**
+         * Apply color options to the editor
+         */
+        function applyColorOptions() {
+            const bgPicker = document.getElementById('color-bg-picker');
+            const textPicker = document.getElementById('color-text-picker');
+            const blurRadio = document.querySelector('input[name="blur-color"]:checked');
+            const editor = document.getElementById('typewriter-editor');
+            const content = document.querySelector('.typewriter-content');
+            
+            if (bgPicker && textPicker && editor) {
+                currentColors.background = bgPicker.value;
+                currentColors.text = textPicker.value;
+                currentColors.blur = blurRadio ? blurRadio.value : 'white';
+                
+                editor.style.backgroundColor = currentColors.background;
+                editor.style.color = currentColors.text;
+                
+                // Apply background to content container (removes white border effect)
+                if (content) {
+                    content.style.backgroundColor = currentColors.background;
+                }
+                
+                // Apply blur color
+                applyBlurColor(currentColors.blur, currentColors.background);
+                
+                console.log(`🎨 Colors applied - BG: ${currentColors.background}, Text: ${currentColors.text}, Blur: ${currentColors.blur}`);
+            }
+            
+            closeColorOptions();
+        }
+
+        /**
+         * Apply blur color to the blur overlays
+         */
+        function applyBlurColor(blurType, bgColor) {
+            const blurTop = document.querySelector('.typewriter-blur-top');
+            const blurBottom = document.querySelector('.typewriter-blur-bottom');
+            
+            if (!blurTop || !blurBottom) return;
+            
+            let blurColor;
+            switch (blurType) {
+                case 'white':
+                    blurColor = 'rgba(255, 255, 255, 0.7)';
+                    break;
+                case 'dark':
+                    blurColor = 'rgba(30, 30, 50, 0.7)';
+                    break;
+                case 'adaptive':
+                    // Convert hex to rgba with 0.7 opacity
+                    const hex = bgColor.replace('#', '');
+                    const r = parseInt(hex.substring(0, 2), 16);
+                    const g = parseInt(hex.substring(2, 4), 16);
+                    const b = parseInt(hex.substring(4, 6), 16);
+                    blurColor = `rgba(${r}, ${g}, ${b}, 0.7)`;
+                    break;
+                default:
+                    blurColor = 'rgba(255, 254, 240, 0.7)';
+            }
+            
+            blurTop.style.background = blurColor;
+            blurBottom.style.background = blurColor;
         }
 
         // Initialize on load
