@@ -1808,6 +1808,29 @@
                 font-size: 11px;
             }
         }
+
+        /* ===== BUY ME A COFFEE BUTTON ===== */
+        .buymeacoffee-btn {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 9999;
+            cursor: pointer;
+            transition: right 0.3s ease, transform 0.3s ease;
+        }
+
+        .buymeacoffee-btn:hover {
+            right: 5px;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .buymeacoffee-btn img {
+            width: 40px;
+            height: auto;
+            transform: rotate(-90deg);
+            display: block;
+        }
         
         /* ===== LEGACY SCROLLAREA STYLES (DEPRECATED) ===== */
         /* Note: Now using .scroll-area, .scroll-content, .scroll-bar classes instead */
