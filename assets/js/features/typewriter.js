@@ -15,9 +15,10 @@ const typewriterSounds = {
 
 // Sound preferences - stores selected sound files
 let typewriterSoundPreferences = {
-    type: 'sounds/typekey_1A.wav',
+    type: 'sounds/typekey_1B.mp3',
     enter: 'sounds/enterkey.wav',
-    space: 'sounds/spacebarkey.mp3'
+    space: 'sounds/spacebarkey5.mp3',
+    backspace: 'sounds/typekey_1C.mp3'
 };
 
 // Available sounds for each category
@@ -25,14 +26,21 @@ const typewriterAvailableSounds = {
     type: [
         { file: 'sounds/typekey.wav', label: 'typekey.wav' },
         { file: 'sounds/typekey_1.wav', label: 'typekey_1.wav' },
-        { file: 'sounds/typekey_1A.wav', label: 'typekey_1A.wav' }
+        { file: 'sounds/typekey_1A.wav', label: 'typekey_1A.wav' },
+        { file: 'sounds/typekey_1B.mp3', label: 'typekey_1B.mp3' }
     ],
     enter: [
         { file: 'sounds/enterkey.wav', label: 'enterkey.wav' },
         { file: 'sounds/enterkey_1.wav', label: 'enterkey_1.wav' }
     ],
     space: [
+        { file: 'sounds/spacebarkey5.mp3', label: 'spacebarkey5.mp3' },
+        { file: 'sounds/spacebarkey4.mp3', label: 'spacebarkey4.mp3' },
         { file: 'sounds/spacebarkey.mp3', label: 'spacebarkey.mp3' }
+    ],
+    backspace: [
+        { file: 'sounds/typekey_1C.mp3', label: 'typekey_1C.mp3' },
+        { file: 'sounds/typekey.wav', label: 'typekey.wav' }
     ]
 };
 
@@ -56,7 +64,8 @@ async function loadTypewriterSounds() {
         const soundFiles = {
             type: typewriterSoundPreferences.type,
             enter: typewriterSoundPreferences.enter,
-            space: typewriterSoundPreferences.space
+            space: typewriterSoundPreferences.space,
+            backspace: typewriterSoundPreferences.backspace
         };
 
         for (const [key, file] of Object.entries(soundFiles)) {
@@ -81,7 +90,8 @@ function reloadTypewriterSounds() {
         const soundFiles = {
             type: typewriterSoundPreferences.type,
             enter: typewriterSoundPreferences.enter,
-            space: typewriterSoundPreferences.space
+            space: typewriterSoundPreferences.space,
+            backspace: typewriterSoundPreferences.backspace
         };
 
         for (const [key, file] of Object.entries(soundFiles)) {
@@ -135,14 +145,14 @@ function openTypewriter() {
     
     intro.innerHTML = `
         <div class="window-titlebar">
-            <div class="window-title">⌨️ Machine à écrire</div>
+            <div class="window-title">⌨️ Drafter</div>
             <div class="window-controls">
                 <div class="window-button" onclick="closeModal('typewriter-intro')" aria-label="Fermer">×</div>
             </div>
         </div>
         <div class="window-content typewriter-intro-content">
             <div class="typewriter-intro-text">
-                <p><strong>Cet outil est inspiré de la Hemingwrite</strong>, une machine à écrire numérique pensée pour une seule chose : <em>écrire</em>.</p>
+                <p><strong>Drafter est inspiré de la Hemingwrite</strong>, une machine à écrire numérique pensée pour une seule chose : <em>écrire</em>.</p>
                 
                 <p>Son principe est volontairement radical : éliminer toute tentation de correction permanente afin de forcer l'écrivain à se concentrer sur le flux des idées plutôt que sur la forme immédiate. Ici, on avance. On ne revient pas sans raison.</p>
                 
@@ -206,7 +216,7 @@ function openTypewriterEditor() {
     sessionStorage.setItem('typewriter-data', JSON.stringify(typewriterData));
     
     // Open fullscreen typewriter in new tab
-    window.open('typewriter.html', '_blank');
+    window.open('drafter.html', '_blank');
     
     // Close intro popup
     closeModal('typewriter-intro');
@@ -404,6 +414,7 @@ function handleTypewriterKeydown(e) {
         
         lastBackspaceTime = now;
         updateBackspaceStatus();
+        playTypewriterSound('backspace');
         return; // Allow the backspace
     }
     
@@ -1315,7 +1326,7 @@ function typewriterImportMAEFromIntro() {
             sessionStorage.setItem('typewriter-data', JSON.stringify(typewriterData));
             
             // Open fullscreen typewriter in new tab
-            window.open('typewriter.html', '_blank');
+            window.open('drafter.html', '_blank');
             
             // Close intro popup
             closeModal('typewriter-intro');
