@@ -23,7 +23,7 @@ const fileSystem = {
                 type: 'folder',
                 icon: '🛠️',
                 children: {
-                    'Machine à écrire': {
+                    'Drafter': {
                         type: 'file',
                         icon: 'img/typewriter.png',
                         action: 'openTypewriter'

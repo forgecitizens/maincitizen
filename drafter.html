@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Machine à écrire</title>
+    <title>Drafter</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
     <style>
         /* ===== RESET & BASE ===== */
@@ -58,52 +58,76 @@
             max-height: 600px;
             display: flex;
             flex-direction: column;
-            background: #c0c0c0;
-            border: 2px outset #dfdfdf;
+            background: rgba(192, 192, 192, 0.3);
+            border: 2px outset rgba(223, 223, 223, 0.4);
             box-shadow: 
-                inset 1px 1px 0 #ffffff,
-                inset -1px -1px 0 #808080,
+                inset 1px 1px 0 rgba(255, 255, 255, 0.3),
+                inset -1px -1px 0 rgba(128, 128, 128, 0.3),
                 4px 4px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
         }
 
-        /* ===== TITLE BAR ===== */
+        .typewriter-fullscreen-container.editor-focused {
+            background: transparent;
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+        /* ===== TITLE BAR - HIDDEN ===== */
         .typewriter-titlebar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 2px 4px;
-            background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            min-height: 24px;
-            user-select: none;
+            display: none;
         }
 
-        .typewriter-title-text {
-            padding-left: 4px;
+        /* ===== VERTICAL DOCUMENT NAME ===== */
+        .typewriter-vertical-title {
+            position: fixed;
+            left: calc(50% - 400px - 40px);
+            top: 50%;
+            transform: translateX(-100%) translateY(-50%) rotate(-90deg);
+            transform-origin: right center;
+            background: rgba(0, 0, 0, 0.6);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 8px 20px;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            z-index: 1000;
+            pointer-events: none;
+            border-radius: 4px 4px 0 0;
         }
 
-        .typewriter-controls {
-            display: flex;
-            gap: 2px;
-        }
-
-        .typewriter-control-btn {
-            width: 18px;
-            height: 16px;
+        /* ===== FLOATING TOGGLE BUTTON ===== */
+        .typewriter-floating-toggle {
+            position: fixed;
+            top: calc(50% - 300px + 8px);
+            right: calc(50% - 400px - 32px);
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
-            border: 1px outset #c0c0c0;
+            background: rgba(0, 0, 0, 0.4);
+            border: none;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 10px;
-            font-weight: bold;
-            color: #000;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 200;
+            transition: all 0.2s ease;
+            opacity: 1;
         }
 
-        .typewriter-control-btn:hover {
+        .typewriter-floating-toggle:hover {
+            background: rgba(0, 0, 0, 0.6);
+            color: rgba(255, 255, 255, 0.95);
+            opacity: 1;
+        }
+
+        .typewriter-floating-toggle.hidden {
+            display: none;
+        }
             background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
         }
 
@@ -112,105 +136,85 @@
             border: 1px inset #c0c0c0;
         }
 
-        /* ===== TOOLBAR ===== */
+        /* ===== TOOLBAR - FLOATING BOTTOM ===== */
         .typewriter-toolbar {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 6px;
-            background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
-            border-bottom: 1px solid #808080;
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        .typewriter-toolbar.collapsed {
-            height: 0;
-            padding: 0 6px;
-            border-bottom: none;
-            opacity: 0;
-        }
-
-        .typewriter-btn {
-            min-width: 28px;
-            height: 26px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 8px;
-            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
-            border: 1px outset #c0c0c0;
+            gap: 4px;
+            padding: 8px 12px;
+            background: rgba(40, 40, 40, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 150;
+        }
+
+        .typewriter-toolbar.collapsed {
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .typewriter-btn {
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
             cursor: pointer;
             font-family: 'MS Sans Serif', serif;
-            font-size: 12px;
-            color: #000;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s ease;
         }
 
         .typewriter-btn:hover {
-            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
         .typewriter-btn:active,
         .typewriter-btn.active {
-            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
-            border: 1px inset #c0c0c0;
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .typewriter-btn-action {
             padding: 0 12px;
-            background: linear-gradient(to bottom, #f0f0f0 0%, #c8c8c8 100%);
         }
 
         .typewriter-btn img {
             width: 18px;
             height: 18px;
             object-fit: contain;
+            filter: brightness(0) invert(1);
+            opacity: 0.9;
         }
 
         .typewriter-separator {
             width: 1px;
             height: 20px;
-            background: #808080;
-            margin: 0 4px;
+            background: rgba(255, 255, 255, 0.2);
+            margin: 0 6px;
         }
 
-        /* Toggle button for toolbar */
+        /* Hide the old toggle button in toolbar */
         .typewriter-toggle-btn {
-            min-width: 24px;
-            height: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
-            border: 1px outset #c0c0c0;
-            cursor: pointer;
-            font-size: 10px;
-            color: #000;
-            margin-left: auto;
-        }
-
-        .typewriter-toggle-btn:hover {
-            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
-        }
-
-        .typewriter-toggle-btn:active {
-            background: linear-gradient(to bottom, #c0c0c0 0%, #e0e0e0 100%);
-            border: 1px inset #c0c0c0;
-        }
-
-        /* Collapsed toolbar toggle bar */
-        .typewriter-toggle-bar {
             display: none;
-            align-items: center;
-            justify-content: flex-end;
-            padding: 2px 6px;
-            background: linear-gradient(to bottom, #e0e0e0 0%, #c0c0c0 100%);
-            border-bottom: 1px solid #808080;
         }
 
-        .typewriter-toggle-bar.show {
-            display: flex;
+        /* Collapsed toolbar toggle bar - HIDDEN, using floating button */
+        .typewriter-toggle-bar {
+            display: none !important;
         }
 
         /* ===== EDITOR CONTENT ===== */
@@ -220,7 +224,12 @@
             flex-direction: column;
             padding: 0;
             overflow: hidden;
-            background: #fffef0;
+            background: rgba(255, 254, 240, 0.3);
+            transition: background 0.4s ease;
+        }
+
+        .typewriter-fullscreen-container.editor-focused .typewriter-content {
+            background: transparent;
         }
 
         .typewriter-viewport {
@@ -233,6 +242,12 @@
             box-shadow: 
                 inset 3px 0 6px -3px rgba(0, 0, 0, 0.15),
                 inset -3px 0 6px -3px rgba(0, 0, 0, 0.15);
+            transition: margin 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .typewriter-fullscreen-container.editor-focused .typewriter-viewport {
+            margin: 0 20px;
+            box-shadow: none;
         }
 
         .typewriter-editor {
@@ -245,7 +260,8 @@
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
             line-height: 1.6;
-            background: #fffef0;
+            background: #000000;
+            color: #FFFFFF;
             border: none;
             outline: none;
             overflow-y: auto;
@@ -260,7 +276,7 @@
         }
 
         .typewriter-editor:focus {
-            background: #fffff8;
+            background: #000000;
         }
 
         /* Blur overlay system */
@@ -282,7 +298,7 @@
             left: 0;
             right: 0;
             height: 0;
-            background: rgba(255, 254, 240, 0.7);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(3px);
             -webkit-backdrop-filter: blur(3px);
             transition: height 0.15s ease-out;
@@ -307,7 +323,7 @@
             right: 0;
             bottom: 0;
             height: 0;
-            background: rgba(255, 254, 240, 0.7);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(3px);
             -webkit-backdrop-filter: blur(3px);
             transition: height 0.15s ease-out, top 0.15s ease-out;
@@ -575,14 +591,113 @@
         }
 
         .sound-options-modal {
-            width: 320px;
-            max-width: 90vw;
-            background: #c0c0c0;
+            width: 520px;
+            max-width: 95vw;
+            background: #c0c0c0 url('img/Drafter_texture.png');
+            background-size: cover;
             border: 2px outset #dfdfdf;
             box-shadow: 
                 inset 1px 1px 0 #ffffff,
                 inset -1px -1px 0 #808080,
                 4px 4px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .sound-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0d8;
+        }
+
+        .sound-row:last-child {
+            border-bottom: none;
+        }
+
+        .sound-row-icon {
+            width: 20px;
+            font-size: 14px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sound-row-label {
+            width: 75px;
+            font-weight: bold;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .sound-row-select {
+            width: 125px;
+            padding: 3px 4px;
+            font-family: 'MS Sans Serif', Tahoma, sans-serif;
+            font-size: 11px;
+            background: #fff;
+            border: 2px inset #808080;
+            flex-shrink: 0;
+        }
+
+        .sound-row-volume {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sound-row-volume input[type="range"] {
+            flex: 1;
+            height: 14px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #0078d4 0%, #0078d4 var(--volume-percent, 50%), #c0c0c0 var(--volume-percent, 50%), #c0c0c0 100%);
+            border: 1px inset #808080;
+            border-radius: 0;
+            outline: none;
+        }
+
+        .sound-row-volume input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 10px;
+            height: 18px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+        }
+
+        .sound-row-volume input[type="range"]::-moz-range-thumb {
+            width: 10px;
+            height: 18px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+            border-radius: 0;
+        }
+
+        .sound-row-volume-value {
+            width: 32px;
+            font-size: 10px;
+            text-align: right;
+            color: #555;
+        }
+
+        .sound-row-preview {
+            flex-shrink: 0;
+        }
+
+        .sound-row-preview button {
+            padding: 3px 8px;
+            font-size: 10px;
+            background: linear-gradient(to bottom, #f8f8f8 0%, #d0d0d0 100%);
+            border: 1px outset #c0c0c0;
+            cursor: pointer;
+        }
+
+        .sound-row-preview button:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%);
         }
 
         .modal-titlebar {
@@ -614,35 +729,6 @@
             padding: 16px;
             background: #fffef0;
             font-size: 12px;
-        }
-
-        .sound-category {
-            margin-bottom: 14px;
-            padding: 10px;
-            background: #f0f0e8;
-            border: 1px solid #d0d0c8;
-        }
-
-        .sound-category-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #000;
-        }
-
-        .sound-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 4px 0;
-            cursor: pointer;
-        }
-
-        .sound-option input[type="radio"] {
-            cursor: pointer;
-        }
-
-        .sound-label {
-            flex: 1;
         }
 
         .sound-preview-btn {
@@ -750,9 +836,10 @@
 
         /* ===== SESSION STATS PANEL ===== */
         .session-stats-panel {
-            position: absolute;
-            bottom: 20px;
-            right: -70px;
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%) translateX(70px);
             width: 70px;
             height: 180px;
             background: #e8e8e8;
@@ -762,13 +849,13 @@
             display: flex;
             flex-direction: row;
             align-items: flex-end;
-            transition: right 0.3s ease;
-            z-index: 100;
+            transition: transform 0.3s ease;
+            z-index: 500;
             box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.2);
         }
 
         .session-stats-panel.expanded {
-            right: 0;
+            transform: translateY(-50%) translateX(0);
         }
 
         .session-stats-toggle {
@@ -839,31 +926,30 @@
         /* ===== BUY ME A COFFEE BUTTON ===== */
         .buymeacoffee-btn {
             position: fixed;
-            right: 0;
-            top: 50%;
-            transform: translateY(-100%);
+            right: calc(50% - 400px);
+            top: calc(50% + 300px);
+            transform: translateX(100%) translateY(-100%);
             z-index: 9999;
             cursor: pointer;
-            transition: right 0.3s ease, transform 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .buymeacoffee-btn:hover {
-            right: 5px;
-            transform: translateY(-100%) scale(1.05);
+            transform: translateX(100%) translateY(-100%) scale(1.05);
         }
 
         .buymeacoffee-btn img {
             width: 40px;
             height: auto;
-            transform: rotate(-90deg);
             display: block;
         }
 
         /* ===== CREDITS PANEL ===== */
         .credits-panel {
-            position: absolute;
-            bottom: 20px;
-            left: -220px;
+            position: fixed;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%) translateX(-220px);
             width: 220px;
             max-height: 280px;
             background: #f5f5f0;
@@ -872,13 +958,13 @@
             border-radius: 0 4px 4px 0;
             display: flex;
             flex-direction: row;
-            transition: left 0.3s ease;
-            z-index: 100;
+            transition: transform 0.3s ease;
+            z-index: 500;
             box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
         }
 
         .credits-panel.expanded {
-            left: 0;
+            transform: translateY(-50%) translateX(0);
         }
 
         .credits-toggle {
@@ -962,8 +1048,16 @@
     </style>
 </head>
 <body>
+    <!-- Vertical Document Title (outside container) -->
+    <div class="typewriter-vertical-title" id="typewriter-vertical-title">Sans titre</div>
+    
     <div class="typewriter-fullscreen-container">
-        <!-- Title Bar -->
+        <!-- Floating Toggle Button -->
+        <button class="typewriter-floating-toggle hidden" id="floating-toggle" onclick="showToolbar()" title="Afficher le menu">
+            <img src="img/menu_drafter.png" alt="Menu" style="width: 16px; height: 16px;">
+        </button>
+        
+        <!-- Title Bar (hidden but kept for compatibility) -->
         <div class="typewriter-titlebar">
             <span class="typewriter-title-text" id="typewriter-title">⌨️ Sans titre</span>
             <div class="typewriter-controls">
@@ -1028,55 +1122,57 @@
                 </div>
             </div>
             
-            <!-- Buy Me A Coffee Button -->
-            <a href="https://buymeacoffee.com/maincitizen" target="_blank" rel="noopener noreferrer" class="buymeacoffee-btn" title="Buy me a coffee">
-                <img src="img/buymeacoffee.png" alt="Buy me a coffee">
-            </a>
-            
-            <!-- Session Stats Panel -->
-            <div class="session-stats-panel" id="session-stats-panel">
-                <div class="session-stats-toggle" onclick="toggleSessionStats()" title="Statistiques de session">
-                    ◀
-                </div>
-                <div class="session-stats-content">
-                    <div class="stats-bar-container">
-                        <div class="stats-bar previous" id="previous-session-bar" title="Session précédente: 0 mots"></div>
-                        <div class="stats-label">Préc.</div>
-                    </div>
-                    <div class="stats-bar-container">
-                        <div class="stats-bar current" id="current-session-bar" title="Session actuelle: 0 mots"></div>
-                        <div class="stats-label">Act.</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Credits Panel -->
-            <div class="credits-panel" id="credits-panel">
-                <div class="credits-toggle" onclick="toggleCredits()" title="Crédits">
-                    Crédits
-                </div>
-                <div class="credits-content">
-                    <h4>🎧 Sons</h4>
-                    <p>Typewriter Key Press 04 by BryanSaraiva — <a href="https://freesound.org/s/820351/" target="_blank">freesound.org/s/820351</a> — License: Attribution 4.0</p>
-                    <p>Toy Electronic Typewriter Spacebar Press by sprinkleCipher — <a href="https://freesound.org/s/752754/" target="_blank">freesound.org/s/752754</a> — License: CC0</p>
-                    <p>Toy Electronic Typewriter Return Lever by sprinkleCipher — <a href="https://freesound.org/s/752753/" target="_blank">freesound.org/s/752753</a> — License: CC0</p>
-                    <p>Typewriter BELL.wav by mincedbeats — <a href="https://freesound.org/s/433596/" target="_blank">freesound.org/s/433596</a> — License: CC0</p>
-                    <p>Typewriter.wav by ddohler — <a href="https://freesound.org/s/9098/" target="_blank">freesound.org/s/9098</a> — License: Attribution 4.0</p>
-                    <p>typewriter.wav by Horn — <a href="https://freesound.org/s/9744/" target="_blank">freesound.org/s/9744</a> — License: Attribution NC 3.0</p>
-                    <p>Typewriter Ding.wav by NHumphrey — <a href="https://freesound.org/s/204466/" target="_blank">freesound.org/s/204466</a> — License: CC0</p>
-                    <p>level-up-01.mp3 by shinephoenixstormcrow — <a href="https://freesound.org/s/337049/" target="_blank">freesound.org/s/337049</a> — License: Attribution 3.0</p>
-                    
-                    <h4>🎨 Icônes</h4>
-                    <p>.pdf file icon by <a href="https://icon-icons.com/authors/1293-ifai-iprojectsi" target="_blank">ifai iprojectsi</a></p>
-                    <p>Sound icon by <a href="https://icon-icons.com/authors/260-maria-guillem" target="_blank">Maria Guillem</a></p>
-                </div>
-            </div>
         </div>
 
         <!-- Status Bar -->
         <div class="typewriter-status">
             <span class="capslock-indicator" id="capslock-indicator">⚠️ La touche Verr. Maj. est enclenchée.</span>
             <span id="typewriter-backspace-status">✓ Retour arrière disponible</span>
+        </div>
+    </div>
+
+    <!-- Buy Me A Coffee Button -->
+    <a href="https://buymeacoffee.com/maincitizen" target="_blank" rel="noopener noreferrer" class="buymeacoffee-btn" title="Buy me a coffee">
+        <img src="img/buymeacoffee.png" alt="Buy me a coffee">
+    </a>
+    
+    <!-- Session Stats Panel -->
+    <div class="session-stats-panel" id="session-stats-panel">
+        <div class="session-stats-toggle" onclick="toggleSessionStats()" title="Statistiques de session">
+            ◀
+        </div>
+        <div class="session-stats-content">
+            <div class="stats-bar-container">
+                <div class="stats-bar previous" id="previous-session-bar" title="Session précédente: 0 mots"></div>
+                <div class="stats-label">Préc.</div>
+            </div>
+            <div class="stats-bar-container">
+                <div class="stats-bar current" id="current-session-bar" title="Session actuelle: 0 mots"></div>
+                <div class="stats-label">Act.</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Credits Panel -->
+    <div class="credits-panel" id="credits-panel">
+        <div class="credits-toggle" onclick="toggleCredits()" title="Crédits">
+            Crédits
+        </div>
+        <div class="credits-content">
+            <h4>🎧 Sons</h4>
+            <p>Typewriter Key Press 04 by BryanSaraiva — <a href="https://freesound.org/s/820351/" target="_blank">freesound.org/s/820351</a> — License: Attribution 4.0</p>
+            <p>Toy Electronic Typewriter Spacebar Press by sprinkleCipher — <a href="https://freesound.org/s/752754/" target="_blank">freesound.org/s/752754</a> — License: CC0</p>
+            <p>Toy Electronic Typewriter Return Lever by sprinkleCipher — <a href="https://freesound.org/s/752753/" target="_blank">freesound.org/s/752753</a> — License: CC0</p>
+            <p>Typewriter BELL.wav by mincedbeats — <a href="https://freesound.org/s/433596/" target="_blank">freesound.org/s/433596</a> — License: CC0</p>
+            <p>Typewriter.wav by ddohler — <a href="https://freesound.org/s/9098/" target="_blank">freesound.org/s/9098</a> — License: Attribution 4.0</p>
+            <p>typewriter.wav by Horn — <a href="https://freesound.org/s/9744/" target="_blank">freesound.org/s/9744</a> — License: Attribution NC 3.0</p>
+            <p>Typewriter Ding.wav by NHumphrey — <a href="https://freesound.org/s/204466/" target="_blank">freesound.org/s/204466</a> — License: CC0</p>
+            <p>level-up-01.mp3 by shinephoenixstormcrow — <a href="https://freesound.org/s/337049/" target="_blank">freesound.org/s/337049</a> — License: Attribution 3.0</p>
+            <p>UI_POP_UP.mp3 by Marevnik — <a href="https://freesound.org/s/708605/" target="_blank">freesound.org/s/708605</a> — License: Attribution 4.0</p>
+            
+            <h4>🎨 Icônes</h4>
+            <p>.pdf file icon by <a href="https://icon-icons.com/authors/1293-ifai-iprojectsi" target="_blank">ifai iprojectsi</a></p>
+            <p>Sound icon by <a href="https://icon-icons.com/authors/260-maria-guillem" target="_blank">Maria Guillem</a></p>
         </div>
     </div>
 
@@ -1088,71 +1184,86 @@
                 <button class="modal-close-btn" onclick="closeSoundOptions()">×</button>
             </div>
             <div class="modal-content">
-                <p style="margin-bottom: 12px;">Sélectionnez les effets sonores pour chaque type de touche :</p>
+                <p style="margin-bottom: 12px;">Réglez le volume et le son pour chaque type de touche :</p>
                 
-                <div class="sound-category">
-                    <div class="sound-category-title">Boutons principaux</div>
-                    <label class="sound-option">
-                        <input type="radio" name="sound-type" value="sounds/typekey.wav">
-                        <span class="sound-label">typekey.wav</span>
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/typekey.wav')">▶</button>
-                    </label>
-                    <label class="sound-option">
-                        <input type="radio" name="sound-type" value="sounds/typekey_1.wav">
-                        <span class="sound-label">typekey_1.wav</span>
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/typekey_1.wav')">▶</button>
-                    </label>
-                    <label class="sound-option">
-                        <input type="radio" name="sound-type" value="sounds/typekey_1A.wav" checked>
-                        <span class="sound-label">typekey_1A.wav</span>
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/typekey_1A.wav')">▶</button>
-                    </label>
-                </div>
-                
-                <div class="sound-category">
-                    <div class="sound-category-title">Bouton "Entrée"</div>
-                    <label class="sound-option">
-                        <input type="radio" name="sound-enter" value="sounds/enterkey.wav" checked>
-                        <span class="sound-label">enterkey.wav</span>
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/enterkey.wav')">▶</button>
-                    </label>
-                    <label class="sound-option">
-                        <input type="radio" name="sound-enter" value="sounds/enterkey_1.wav">
-                        <span class="sound-label">enterkey_1.wav</span>
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/enterkey_1.wav')">▶</button>
-                    </label>
-                </div>
-                
-                <div class="sound-category">
-                    <div class="sound-category-title">Bouton "Espace"</div>
-                    <label class="sound-option">
-                        <input type="radio" name="sound-space" value="sounds/spacebarkey3.wav" checked>
-                        <span class="sound-label">spacebarkey3.wav</span>
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/spacebarkey3.wav')">▶</button>
-                    </label>
-                    <label class="sound-option">
-                        <input type="radio" name="sound-space" value="sounds/spacebarkey2.mp3">
-                        <span class="sound-label">spacebarkey2.mp3</span>
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/spacebarkey2.mp3')">▶</button>
-                    </label>
-                    <label class="sound-option">
-                        <input type="radio" name="sound-space" value="sounds/spacebarkey.mp3">
-                        <span class="sound-label">spacebarkey.mp3</span>
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/spacebarkey.mp3')">▶</button>
-                    </label>
-                </div>
-                
-                <div class="encouragement-section">
-                    <div class="encouragement-title">🏆 Encouragements</div>
-                    <div class="encouragement-description">
-                        Un son sera joué à chaque fois que vous atteignez ce nombre de mots.
+                <div class="sound-row">
+                    <div class="sound-row-icon">⌨️</div>
+                    <div class="sound-row-label">Touches</div>
+                    <select class="sound-row-select" id="sound-select-type">
+                        <option value="sounds/typekey_1B.mp3" selected>Reno</option>
+                        <option value="sounds/typekey.wav">Jack</option>
+                        <option value="sounds/typekey_1.wav">Oslo</option>
+                        <option value="sounds/typekey_1A.wav">Antibes</option>
+                    </select>
+                    <div class="sound-row-volume">
+                        <input type="range" id="volume-type" min="0" max="100" value="50" oninput="updateVolumeSlider(this)">
+                        <span class="sound-row-volume-value" id="volume-type-value">50</span>
                     </div>
-                    <div class="slider-container">
-                        <input type="range" id="encouragement-slider" min="1" max="10" value="3" oninput="updateSliderValue()">
-                        <span class="slider-value" id="slider-value">300 mots</span>
+                    <div class="sound-row-preview">
+                        <button onclick="previewSoundRow('type')">▶</button>
                     </div>
-                    <div class="encouragement-preview">
-                        <button class="sound-preview-btn" onclick="previewSound('sounds/levelup_01.mp3')">▶ Écouter le son</button>
+                </div>
+
+                <div class="sound-row">
+                    <div class="sound-row-icon">↵</div>
+                    <div class="sound-row-label">Entrée</div>
+                    <select class="sound-row-select" id="sound-select-enter">
+                        <option value="sounds/enterkey.wav" selected>Bella</option>
+                        <option value="sounds/enterkey_1.wav">Berlin</option>
+                    </select>
+                    <div class="sound-row-volume">
+                        <input type="range" id="volume-enter" min="0" max="100" value="50" oninput="updateVolumeSlider(this)">
+                        <span class="sound-row-volume-value" id="volume-enter-value">50</span>
+                    </div>
+                    <div class="sound-row-preview">
+                        <button onclick="previewSoundRow('enter')">▶</button>
+                    </div>
+                </div>
+
+                <div class="sound-row">
+                    <div class="sound-row-icon">␣</div>
+                    <div class="sound-row-label">Espace</div>
+                    <select class="sound-row-select" id="sound-select-space">
+                        <option value="sounds/spacebarkey5.mp3" selected>Moon</option>
+                        <option value="sounds/spacebarkey4.mp3">Unfair</option>
+                        <option value="sounds/spacebarkey3.wav">Serious</option>
+                        <option value="sounds/spacebarkey.mp3">Justice</option>
+                    </select>
+                    <div class="sound-row-volume">
+                        <input type="range" id="volume-space" min="0" max="100" value="50" oninput="updateVolumeSlider(this)">
+                        <span class="sound-row-volume-value" id="volume-space-value">50</span>
+                    </div>
+                    <div class="sound-row-preview">
+                        <button onclick="previewSoundRow('space')">▶</button>
+                    </div>
+                </div>
+
+                <div class="sound-row">
+                    <div class="sound-row-icon">⌫</div>
+                    <div class="sound-row-label">Ret. Arr.</div>
+                    <select class="sound-row-select" id="sound-select-backspace">
+                        <option value="sounds/typekey_1C.mp3" selected>Max</option>
+                        <option value="sounds/typekey.wav">Claude</option>
+                    </select>
+                    <div class="sound-row-volume">
+                        <input type="range" id="volume-backspace" min="0" max="100" value="50" oninput="updateVolumeSlider(this)">
+                        <span class="sound-row-volume-value" id="volume-backspace-value">50</span>
+                    </div>
+                    <div class="sound-row-preview">
+                        <button onclick="previewSoundRow('backspace')">▶</button>
+                    </div>
+                </div>
+
+                <div class="sound-row" style="background: #e8f4e8; margin: 12px -16px -16px -16px; padding: 12px 16px; border-top: 1px solid #c8d8c8;">
+                    <div class="sound-row-icon">🏆</div>
+                    <div class="sound-row-label">Encouragements</div>
+                    <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 10px; color: #555;">Tous les</span>
+                        <input type="range" id="encouragement-slider" min="1" max="10" value="3" style="width: 80px;" oninput="updateSliderValue()">
+                        <span class="slider-value" id="slider-value" style="font-size: 11px; color: #006600; font-weight: bold;">300 mots</span>
+                    </div>
+                    <div class="sound-row-preview">
+                        <button onclick="previewSound('sounds/levelup_01.mp3')">▶</button>
                     </div>
                 </div>
                 
@@ -1174,16 +1285,16 @@
                 <div class="color-section">
                     <div class="color-section-title">Couleur de fond</div>
                     <div class="color-picker-wrapper">
-                        <input type="color" id="color-bg-picker" class="color-picker-input" value="#fffef0" oninput="updateColorPreview()">
-                        <span class="color-hex-display" id="color-bg-hex">#fffef0</span>
+                        <input type="color" id="color-bg-picker" class="color-picker-input" value="#000000" oninput="updateColorPreview()">
+                        <span class="color-hex-display" id="color-bg-hex">#000000</span>
                     </div>
                 </div>
                 
                 <div class="color-section">
                     <div class="color-section-title">Couleur de la police</div>
                     <div class="color-picker-wrapper">
-                        <input type="color" id="color-text-picker" class="color-picker-input" value="#1a1a2e" oninput="updateColorPreview()">
-                        <span class="color-hex-display" id="color-text-hex">#1a1a2e</span>
+                        <input type="color" id="color-text-picker" class="color-picker-input" value="#FFFFFF" oninput="updateColorPreview()">
+                        <span class="color-hex-display" id="color-text-hex">#FFFFFF</span>
                     </div>
                 </div>
 
@@ -1191,7 +1302,7 @@
                     <div class="color-section-title">Couleur de l'effet focus</div>
                     <div class="blur-color-options">
                         <label class="blur-color-option">
-                            <input type="radio" name="blur-color" value="white" checked>
+                            <input type="radio" name="blur-color" value="white">
                             <span class="blur-color-swatch white"></span>
                             <span>Blanc</span>
                         </label>
@@ -1201,7 +1312,7 @@
                             <span>Sombre</span>
                         </label>
                         <label class="blur-color-option">
-                            <input type="radio" name="blur-color" value="adaptive">
+                            <input type="radio" name="blur-color" value="adaptive" checked>
                             <span class="blur-color-swatch adaptive"></span>
                             <span>Adaptatif</span>
                         </label>
@@ -1235,11 +1346,20 @@
             space: null
         };
 
-        // Sound preferences - typekey_1A.wav as default
+        // Sound preferences - typekey_1B.mp3 as default
         let soundPreferences = {
-            type: 'sounds/typekey_1A.wav',
+            type: 'sounds/typekey_1B.mp3',
             enter: 'sounds/enterkey.wav',
-            space: 'sounds/spacebarkey3.wav'
+            space: 'sounds/spacebarkey5.mp3',
+            backspace: 'sounds/typekey_1C.mp3'
+        };
+
+        // Volume preferences (0-100)
+        let volumePreferences = {
+            type: 50,
+            enter: 50,
+            space: 50,
+            backspace: 50
         };
 
         // Backspace cooldown
@@ -1293,6 +1413,9 @@
             // Initialize editor
             initEditor();
             
+            // Apply default blur color (adaptive based on default background)
+            applyBlurColor(currentColors.blur, currentColors.background);
+            
             // Focus editor
             setTimeout(() => {
                 const editor = document.getElementById('typewriter-editor');
@@ -1309,14 +1432,9 @@
             if (storedData) {
                 try {
                     const data = JSON.parse(storedData);
-                    documentName = data.title || 'Sans titre';
                     
                     // Update title
-                    const titleEl = document.getElementById('typewriter-title');
-                    if (titleEl) {
-                        titleEl.textContent = `⌨️ ${documentName}`;
-                    }
-                    document.title = documentName + ' - Machine à écrire';
+                    updateDocumentTitle(data.title || 'Sans titre');
                     
                     // Load previous session words if available
                     if (data.previousSession && typeof data.previousSession.words === 'number') {
@@ -1388,12 +1506,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const title = urlParams.get('title');
             if (title && documentName === 'Sans titre') {
-                documentName = decodeURIComponent(title);
-                const titleEl = document.getElementById('typewriter-title');
-                if (titleEl) {
-                    titleEl.textContent = `⌨️ ${documentName}`;
-                }
-                document.title = documentName + ' - Machine à écrire';
+                updateDocumentTitle(decodeURIComponent(title));
             }
             
             // Initialize session stats bars
@@ -1408,7 +1521,7 @@
                 for (const [key, file] of Object.entries(soundPreferences)) {
                     const audio = new Audio(file);
                     audio.preload = 'auto';
-                    audio.volume = 0.5;
+                    audio.volume = (volumePreferences[key] || 50) / 100;
                     sounds[key] = audio;
                 }
                 
@@ -1771,6 +1884,7 @@
          */
         function initEditor() {
             const editor = document.getElementById('typewriter-editor');
+            const container = document.querySelector('.typewriter-fullscreen-container');
             if (!editor) return;
             
             editor.addEventListener('keydown', handleKeydown);
@@ -1781,6 +1895,18 @@
             editor.addEventListener('click', updateBlurViewport);
             editor.addEventListener('focus', updateBlurViewport);
             editor.addEventListener('scroll', updateBlurViewport);
+            
+            // Auto-collapse toolbar when clicking in editor
+            editor.addEventListener('focus', hideToolbar);
+            editor.addEventListener('click', hideToolbar);
+            
+            // Minimalist mode - fade out borders when editor is focused
+            editor.addEventListener('focus', function() {
+                if (container) container.classList.add('editor-focused');
+            });
+            editor.addEventListener('blur', function() {
+                if (container) container.classList.remove('editor-focused');
+            });
             
             // Handle paste - BLOCKED
             editor.addEventListener('paste', function(e) {
@@ -1856,6 +1982,7 @@
                     
                     lastBackspaceTime = now;
                     updateBackspaceStatus();
+                    playSound('backspace');
                 }
                 return;
             }
@@ -2031,18 +2158,64 @@
          */
         function toggleToolbar() {
             const toolbar = document.getElementById('typewriter-toolbar');
-            const toggleBar = document.getElementById('typewriter-toggle-bar');
-            const toggleBtn = document.getElementById('toggle-toolbar-btn');
+            const floatingToggle = document.getElementById('floating-toggle');
             
             toolbarCollapsed = !toolbarCollapsed;
             
             if (toolbarCollapsed) {
                 toolbar.classList.add('collapsed');
-                toggleBar.classList.add('show');
+                floatingToggle.classList.remove('hidden');
             } else {
                 toolbar.classList.remove('collapsed');
-                toggleBar.classList.remove('show');
+                floatingToggle.classList.add('hidden');
             }
+        }
+
+        /**
+         * Show toolbar (from floating button)
+         */
+        function showToolbar() {
+            const toolbar = document.getElementById('typewriter-toolbar');
+            const floatingToggle = document.getElementById('floating-toggle');
+            
+            // Play ui_pop sound
+            const popSound = new Audio('sounds/ui_pop.mp3');
+            popSound.volume = 0.3;
+            popSound.play().catch(() => {});
+            
+            toolbarCollapsed = false;
+            toolbar.classList.remove('collapsed');
+            floatingToggle.classList.add('hidden');
+        }
+
+        /**
+         * Hide toolbar (auto-collapse)
+         */
+        function hideToolbar() {
+            const toolbar = document.getElementById('typewriter-toolbar');
+            const floatingToggle = document.getElementById('floating-toggle');
+            
+            toolbarCollapsed = true;
+            toolbar.classList.add('collapsed');
+            floatingToggle.classList.remove('hidden');
+        }
+
+        /**
+         * Update document title in all locations
+         */
+        function updateDocumentTitle(name) {
+            documentName = name;
+            
+            // Update horizontal title (hidden but kept for compatibility)
+            const titleEl = document.getElementById('typewriter-title');
+            if (titleEl) titleEl.textContent = `⌨️ ${documentName}`;
+            
+            // Update vertical title
+            const verticalTitleEl = document.getElementById('typewriter-vertical-title');
+            if (verticalTitleEl) verticalTitleEl.textContent = documentName;
+            
+            // Update browser tab title
+            document.title = documentName + ' - Drafter';
         }
 
         /**
@@ -2084,10 +2257,7 @@
                     editor.innerHTML = data.content;
                     
                     if (data.title) {
-                        documentName = data.title;
-                        const titleEl = document.getElementById('typewriter-title');
-                        if (titleEl) titleEl.textContent = `⌨️ ${documentName}`;
-                        document.title = documentName + ' - Machine à écrire';
+                        updateDocumentTitle(data.title);
                     }
                     
                     // Load previous session data
@@ -2388,14 +2558,39 @@
             const modal = document.getElementById('sound-modal');
             if (modal) modal.classList.add('show');
             
-            // Set current selections
-            const typeRadio = document.querySelector(`input[name="sound-type"][value="${soundPreferences.type}"]`);
-            const enterRadio = document.querySelector(`input[name="sound-enter"][value="${soundPreferences.enter}"]`);
-            const spaceRadio = document.querySelector(`input[name="sound-space"][value="${soundPreferences.space}"]`);
+            // Set current selections in dropdowns
+            const typeSelect = document.getElementById('sound-select-type');
+            const enterSelect = document.getElementById('sound-select-enter');
+            const spaceSelect = document.getElementById('sound-select-space');
+            const backspaceSelect = document.getElementById('sound-select-backspace');
             
-            if (typeRadio) typeRadio.checked = true;
-            if (enterRadio) enterRadio.checked = true;
-            if (spaceRadio) spaceRadio.checked = true;
+            if (typeSelect) typeSelect.value = soundPreferences.type;
+            if (enterSelect) enterSelect.value = soundPreferences.enter;
+            if (spaceSelect) spaceSelect.value = soundPreferences.space;
+            if (backspaceSelect) backspaceSelect.value = soundPreferences.backspace;
+            
+            // Set volume sliders
+            const volumeType = document.getElementById('volume-type');
+            const volumeEnter = document.getElementById('volume-enter');
+            const volumeSpace = document.getElementById('volume-space');
+            const volumeBackspace = document.getElementById('volume-backspace');
+            
+            if (volumeType) {
+                volumeType.value = volumePreferences.type;
+                updateVolumeSlider(volumeType);
+            }
+            if (volumeEnter) {
+                volumeEnter.value = volumePreferences.enter;
+                updateVolumeSlider(volumeEnter);
+            }
+            if (volumeSpace) {
+                volumeSpace.value = volumePreferences.space;
+                updateVolumeSlider(volumeSpace);
+            }
+            if (volumeBackspace) {
+                volumeBackspace.value = volumePreferences.backspace;
+                updateVolumeSlider(volumeBackspace);
+            }
             
             // Set encouragement slider to current value
             const slider = document.getElementById('encouragement-slider');
@@ -2423,16 +2618,57 @@
         }
 
         /**
+         * Update volume slider visual and value display
+         */
+        function updateVolumeSlider(slider) {
+            const value = slider.value;
+            const id = slider.id;
+            const valueDisplay = document.getElementById(id + '-value');
+            if (valueDisplay) valueDisplay.textContent = value;
+            
+            // Update slider background gradient
+            slider.style.setProperty('--volume-percent', value + '%');
+        }
+
+        /**
+         * Preview sound for a specific row
+         */
+        function previewSoundRow(type) {
+            const select = document.getElementById('sound-select-' + type);
+            const volumeSlider = document.getElementById('volume-' + type);
+            
+            if (select) {
+                const audio = new Audio(select.value);
+                audio.volume = volumeSlider ? parseInt(volumeSlider.value) / 100 : 0.5;
+                audio.play().catch(() => {});
+            }
+        }
+
+        /**
          * Accept sound options
          */
         function acceptSoundOptions() {
-            const typeSound = document.querySelector('input[name="sound-type"]:checked');
-            const enterSound = document.querySelector('input[name="sound-enter"]:checked');
-            const spaceSound = document.querySelector('input[name="sound-space"]:checked');
+            // Get selected sounds from dropdowns
+            const typeSelect = document.getElementById('sound-select-type');
+            const enterSelect = document.getElementById('sound-select-enter');
+            const spaceSelect = document.getElementById('sound-select-space');
+            const backspaceSelect = document.getElementById('sound-select-backspace');
             
-            if (typeSound) soundPreferences.type = typeSound.value;
-            if (enterSound) soundPreferences.enter = enterSound.value;
-            if (spaceSound) soundPreferences.space = spaceSound.value;
+            if (typeSelect) soundPreferences.type = typeSelect.value;
+            if (enterSelect) soundPreferences.enter = enterSelect.value;
+            if (spaceSelect) soundPreferences.space = spaceSelect.value;
+            if (backspaceSelect) soundPreferences.backspace = backspaceSelect.value;
+            
+            // Get volume values
+            const volumeType = document.getElementById('volume-type');
+            const volumeEnter = document.getElementById('volume-enter');
+            const volumeSpace = document.getElementById('volume-space');
+            const volumeBackspace = document.getElementById('volume-backspace');
+            
+            if (volumeType) volumePreferences.type = parseInt(volumeType.value);
+            if (volumeEnter) volumePreferences.enter = parseInt(volumeEnter.value);
+            if (volumeSpace) volumePreferences.space = parseInt(volumeSpace.value);
+            if (volumeBackspace) volumePreferences.backspace = parseInt(volumeBackspace.value);
             
             // Save encouragement threshold
             const slider = document.getElementById('encouragement-slider');
@@ -2447,15 +2683,15 @@
 
         // Color preferences - default values
         const defaultColors = {
-            background: '#fffef0',
-            text: '#1a1a2e',
-            blur: 'white'
+            background: '#000000',
+            text: '#FFFFFF',
+            blur: 'adaptive'
         };
         
         let currentColors = {
-            background: '#fffef0',
-            text: '#1a1a2e',
-            blur: 'white'
+            background: '#000000',
+            text: '#FFFFFF',
+            blur: 'adaptive'
         };
 
         /**
