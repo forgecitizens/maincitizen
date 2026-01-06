@@ -1045,6 +1045,120 @@
                 max-height: 100%;
             }
         }
+
+        /* ===== MOBILE SPECIFIC FIXES ===== */
+        @media (max-width: 600px) {
+            /* Fix toolbar overflow - make it scrollable horizontally */
+            .typewriter-toolbar {
+                justify-content: flex-start;
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE/Edge */
+                padding: 8px 8px;
+                gap: 3px;
+            }
+            
+            .typewriter-toolbar::-webkit-scrollbar {
+                display: none; /* Chrome/Safari */
+            }
+            
+            .typewriter-btn {
+                min-width: 36px;
+                height: 36px;
+                padding: 0 8px;
+                flex-shrink: 0;
+            }
+            
+            .typewriter-separator {
+                margin: 0 4px;
+                flex-shrink: 0;
+            }
+            
+            /* Fix sound options modal for mobile */
+            .sound-options-modal {
+                width: 100%;
+                max-width: calc(100vw - 20px);
+                margin: 10px;
+            }
+            
+            .sound-row {
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 10px 0;
+            }
+            
+            .sound-row-icon {
+                width: 24px;
+            }
+            
+            .sound-row-label {
+                width: 60px;
+                font-size: 10px;
+            }
+            
+            .sound-row-select {
+                width: 100px;
+                font-size: 10px;
+            }
+            
+            .sound-row-volume {
+                flex: 1;
+                min-width: 80px;
+            }
+            
+            .sound-row-volume input[type="range"] {
+                min-width: 50px;
+            }
+            
+            .sound-row-volume-value {
+                width: 25px;
+                font-size: 9px;
+            }
+            
+            .sound-row-preview button {
+                padding: 4px 6px;
+                font-size: 9px;
+            }
+            
+            .modal-content {
+                padding: 12px;
+            }
+            
+            /* Fix color options modal for mobile */
+            .color-options-modal {
+                width: 100%;
+                max-width: calc(100vw - 20px);
+                margin: 10px;
+            }
+            
+            .color-section {
+                padding: 10px;
+                margin-bottom: 12px;
+            }
+            
+            .color-buttons-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .color-btn {
+                width: 100%;
+                padding: 10px 16px;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 400px) {
+            .sound-row-select {
+                width: 80px;
+            }
+            
+            .sound-row-label {
+                width: 50px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1384,6 +1498,12 @@
         let encouragementThreshold = 300; // Default: 300 words
         let lastWordMilestone = 0; // Track the last milestone reached
         let currentWordCount = 0;
+
+        // Mobile detection
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+                || (window.innerWidth <= 600);
+        }
 
         // Session stats
         let previousSessionWords = 0; // Words from previous session (loaded from file)
@@ -1914,6 +2034,74 @@
                 playErrorSound();
                 showErrorPopup("Ce sont tes mots à toi qui comptent, pas ceux des autres.");
             });
+            
+            // Mobile-specific restrictions: block mass copy
+            editor.addEventListener('copy', function(e) {
+                if (isMobileDevice()) {
+                    const selection = window.getSelection();
+                    if (selection && !selection.isCollapsed) {
+                        const selectedText = selection.toString().trim();
+                        const wordCount = selectedText.split(/\s+/).filter(w => w.length > 0).length;
+                        
+                        // Block copy if more than 3 words selected on mobile
+                        if (wordCount > 3) {
+                            e.preventDefault();
+                            playErrorSound();
+                            showErrorPopup("Garde tes mots pour toi, pas pour le presse-papiers.");
+                            return;
+                        }
+                    }
+                }
+            });
+            
+            // Mobile-specific restrictions: block cut entirely on mobile
+            editor.addEventListener('cut', function(e) {
+                if (isMobileDevice()) {
+                    e.preventDefault();
+                    playErrorSound();
+                    showErrorPopup("Couper n'est pas permis ici. Continue d'écrire.");
+                    return;
+                }
+            });
+            
+            // Mobile-specific: block Ctrl+A / Cmd+A (select all)
+            editor.addEventListener('keydown', function(e) {
+                if (isMobileDevice()) {
+                    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
+                        e.preventDefault();
+                        playErrorSound();
+                        showErrorPopup("Sélectionner tout? Ce n'est pas vraiment le but ici.");
+                        return;
+                    }
+                }
+            });
+            
+            // Mobile-specific: intercept context menu to prevent long-press select all
+            editor.addEventListener('selectstart', function(e) {
+                // We allow selection to start, but will limit what can be done with it
+            });
+            
+            // Monitor selection changes on mobile to limit selection size
+            if (isMobileDevice()) {
+                let selectionCheckTimeout = null;
+                document.addEventListener('selectionchange', function() {
+                    if (selectionCheckTimeout) clearTimeout(selectionCheckTimeout);
+                    selectionCheckTimeout = setTimeout(function() {
+                        const selection = window.getSelection();
+                        if (selection && !selection.isCollapsed) {
+                            const selectedText = selection.toString().trim();
+                            const wordCount = selectedText.split(/\s+/).filter(w => w.length > 0).length;
+                            
+                            // If selection is too large (more than 50 words), collapse it
+                            if (wordCount > 50) {
+                                selection.collapseToEnd();
+                                playErrorSound();
+                                showErrorPopup("Sélection trop large. Concentre-toi sur l'écriture.");
+                            }
+                        }
+                    }, 300);
+                });
+            }
             
             setTimeout(updateBlurViewport, 100);
         }
