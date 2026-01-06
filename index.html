@@ -27,12 +27,17 @@
             <div class="icon-label">Drafter</div>
         </div>
 
-        <div class="desktop-icon" style="top: 320px; left: 20px;" data-modal="contact">
+        <div class="desktop-icon" style="top: 320px; left: 20px;" data-modal="ia-articles">
+            <img class="icon-image" src="img/ia.png" alt="Vulgarisation IA générative">
+            <div class="icon-label">Vulgarisation IA générative</div>
+        </div>
+
+        <div class="desktop-icon" style="top: 420px; left: 20px;" data-modal="contact">
             <img class="icon-image" src="img/email.png" alt="Contact">
             <div class="icon-label">Contact</div>
         </div>
 
-        <div class="desktop-icon" style="bottom: 60px; left: 20px;" onclick="openRadio()">
+        <div class="desktop-icon" style="top: 520px; left: 20px;" onclick="openRadio()">
             <div class="icon-wrapper">
                 <img class="icon-image" src="img/cassette.png" alt="Radio">
                 <img class="shortcut-arrow" src="img/shortcut.png" alt="">
@@ -584,6 +589,87 @@
         <div class="resize-handle"></div>
     </div>
 
+    <!-- IA Articles Modal -->
+    <div class="window" id="ia-articles-modal" role="dialog" aria-modal="true" aria-labelledby="ia-articles-title">
+        <div class="window-titlebar">
+            <div class="window-title" id="ia-articles-title">📚 Vulgarisation IA générative</div>
+            <div class="window-controls">
+                <div class="window-button" onclick="minimizeModal('ia-articles-modal')" aria-label="Réduire">_</div>
+                <div class="window-button" onclick="maximizeModal('ia-articles-modal')" aria-label="Agrandir">□</div>
+                <div class="window-button" onclick="closeModal('ia-articles-modal')" aria-label="Fermer">×</div>
+            </div>
+        </div>
+        <div class="window-body">
+            <div class="window-content">
+                <!-- Header Section -->
+                <div class="info-section">
+                    <h3 class="section-title">📄 Documents de vulgarisation sur l'IA générative</h3>
+                    <p style="margin: 0; font-size: 11px; color: #666;">
+                        Retrouvez ici des articles et documents de vulgarisation sur l'intelligence artificielle générative.
+                        Cliquez sur un document pour le télécharger.
+                    </p>
+                </div>
+
+                <!-- Documents Table -->
+                <div class="articles-table-container">
+                    <table class="articles-table">
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Auteur</th>
+                                <th>Téléchargements</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody id="articles-list">
+                            <tr class="article-row" data-article-id="prompting-role" data-file="articles/prompting_IA_personnalité.pdf">
+                                <td class="article-name">
+                                    <img src="img/pdf.png" alt="PDF" class="article-icon">
+                                    <span class="article-title-text">Mythe et réalité du prompting par rôle</span>
+                                </td>
+                                <td class="article-author">Andrei Eleodor Sirbu</td>
+                                <td class="article-downloads">
+                                    <span class="download-count" id="downloads-prompting-role">0</span>
+                                    <span class="download-label">téléchargements</span>
+                                </td>
+                                <td class="article-rating">
+                                    <div class="star-rating" data-article-id="prompting-role">
+                                        <span class="star" data-value="1">☆</span>
+                                        <span class="star" data-value="2">☆</span>
+                                        <span class="star" data-value="3">☆</span>
+                                        <span class="star" data-value="4">☆</span>
+                                        <span class="star" data-value="5">☆</span>
+                                    </div>
+                                    <span class="rating-value" id="rating-prompting-role">-</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="window-footer">
+            <div class="status-text">📁 1 document(s) disponible(s)</div>
+        </div>
+        <div class="window-resize-handle" aria-hidden="true"></div>
+    </div>
+
+    <!-- Download Confirmation Popup -->
+    <div class="download-popup" id="downloadPopup">
+        <div class="download-popup-content">
+            <div class="download-popup-header">
+                <img src="img/pdf.png" alt="PDF" style="width: 32px; height: 32px;">
+                <span>Téléchargement</span>
+            </div>
+            <p class="download-popup-message">Voulez-vous télécharger ce document ?</p>
+            <p class="download-popup-filename" id="downloadFilename"></p>
+            <div class="download-popup-buttons">
+                <button class="action-button primary" id="downloadYes">Oui</button>
+                <button class="action-button secondary" id="downloadNo">Non</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Buy Me A Coffee Button -->
     <a href="https://buymeacoffee.com/maincitizen" target="_blank" rel="noopener noreferrer" class="buymeacoffee-btn" title="Buy me a coffee">
         <img src="img/buymeacoffee.png" alt="Buy me a coffee">
@@ -601,6 +687,7 @@
     <script defer src="assets/js/features/folderNavigation.js"></script>
     <script defer src="assets/js/features/typewriter.js"></script>
     <script defer src="assets/js/features/radio.js"></script>
+    <script defer src="assets/js/features/articles.js"></script>
     <script defer src="assets/js/app.js"></script>
 
 
